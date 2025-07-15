@@ -1,0 +1,9 @@
+from .categoriaProducto_admin import CategoriaProductoNameAdmin
+from .marca_admin import MarcaAdmin
+from .modelo_admin import ModeloAdmin
+from .unidadMedida_admin import UnidadMedidaAdmin
+
+from .contactoProvedor_admin import ContactoProveedorAdmin
+from .producto_admin import ProductoAdmin
+from .productoImagen_admin import ProductoImagenAdmin
+from .provedorEmpresa_admin import ProveedorEmpresaAdmin
