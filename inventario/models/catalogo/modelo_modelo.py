@@ -11,7 +11,8 @@ class Modelo(BaseModel):
         Marca,
         on_delete=models.CASCADE,
         related_name='modelos',
-        verbose_name=_("Marca asociada")
+        verbose_name=_("Marca asociada"),
+        help_text=_("Marca - modelo")
     )
 
     class Meta:

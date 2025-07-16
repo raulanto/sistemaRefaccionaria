@@ -4,4 +4,7 @@ from inventario.models import ProveedorEmpresa
 
 @admin.register(ProveedorEmpresa)
 class ProveedorEmpresaAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["nombre","telefono","email","sitio_web"]
+    list_editable = ["sitio_web"]
+    list_filter = ["nombre"]
+

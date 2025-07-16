@@ -2,7 +2,7 @@ from django.db import models
 from catalogo.baseModel import BaseModel
 from django.utils.translation import gettext_lazy as _
 from .provedorEmpresa_modelo import ProveedorEmpresa
-
+from django.contrib.auth.models import User
 
 class ContactoProveedor(BaseModel):
     TIPO_CONTACTO = [
@@ -28,6 +28,13 @@ class ContactoProveedor(BaseModel):
         default='VENTAS'
     )
     puesto = models.CharField(_("Puesto"), max_length=50, blank=True)
+    usuario=models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='usuario',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = _("Contacto de proveedor")

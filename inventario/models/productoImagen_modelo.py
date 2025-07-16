@@ -7,9 +7,6 @@ from .producto_modelo import Producto
 
 
 
-
-
-
 class ProductoImagen(BaseModel):
     producto = models.ForeignKey(
         Producto,

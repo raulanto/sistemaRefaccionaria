@@ -77,7 +77,8 @@ class Producto(BaseModel):
         Modelo,
         on_delete=models.PROTECT,
         related_name='productos',
-        verbose_name=_("Modelo")
+        verbose_name=_("Modelo"),
+        help_text=_("Marca - modelo")
     )
 
     categoria = models.ForeignKey(
