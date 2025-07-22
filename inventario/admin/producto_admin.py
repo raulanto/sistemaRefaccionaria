@@ -4,4 +4,4 @@ from inventario.models import Producto
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['nombre', 'estado']

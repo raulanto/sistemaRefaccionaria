@@ -2,6 +2,7 @@
 
 {% extends 'base/body.html' %}
 
+
 {% block headercontect %}
     {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
@@ -19,7 +20,7 @@
                         <th>Precio Mayoreo</th>
                         <th>Cantidad Mayoreo</th>
                         <th>Cantidad Productos</th>
-                        <th>Modelo</th>
+                        <th>Marca</th>
                         <th>Categoria</th>
                         <th>estado</th>
                     </tr>
@@ -32,7 +33,7 @@
                         <th>Precio Mayoreo</th>
                         <th>Cantidad Mayoreo</th>
                         <th>Cantidad Productos</th>
-                        <th>Modelo</th>
+                        <th>Marca</th>
                         <th>Categoria</th>
                         <th>estado</th>
                     </tr>
@@ -41,11 +42,24 @@
                     {% for producto in productos %}
                     <tr>
                         <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.precio_compra }}$</td>
+                        <td>{{ producto.precio_venta }}$</td>
+                        <td>{{ producto.precio_mayoreo|default_if_none:'No Establecido'  }}</td>
+                        <td>{{ producto.cantidad_mayoreo }}</td>
+                        <td>
+                            {% if producto.stock > 0 %}
+                                <span class="badge badge-success">{{ producto.stock }}</span>
+                            {% else %}
+                                <span class="badge badge-danger">Agotado</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ producto.modelo.marca }}</td>
+                        <td>{{ producto.categoria.padre }} -{{ producto.categoria }}</td>
+                        <td>{{ producto.estado }}</td>
 
                         <td>
-                            <button class="btn btn-primary">Editar</button>
-                            <button class="btn btn-danger">Eliminar</button>
+                            <button class="btn btn-primary btn-sm">Editar</button>
+                            <button class="btn btn-danger btn-sm">Eliminar</button>
                         </td>
                     </tr>
                     {% endfor %}

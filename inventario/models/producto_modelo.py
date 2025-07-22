@@ -15,6 +15,7 @@ class Producto(BaseModel):
         ('AGOTADO', _('Agotado')),
         ('DESCONTINUADO', _('Descontinuado')),
         ('PEDIDO_ESPECIAL', _('Pedido especial')),
+        ('Proximo a gotarse', _('proximo')),
     ]
 
     codigo = models.CharField(
@@ -106,7 +107,7 @@ class Producto(BaseModel):
 
     estado = models.CharField(
         _("Estado del producto"),
-        max_length=15,
+        max_length=30,
         choices=ESTADO_PRODUCTO,
         default='DISPONIBLE'
     )
@@ -149,3 +150,16 @@ class Producto(BaseModel):
         if self.precio_compra == 0:
             return 0
         return ((self.precio_venta - self.precio_compra) / self.precio_compra) * 100
+
+
+    def estado_producto(self):
+        if self.stock <= 0:
+            return 'AGOTADO'
+        if self.stock < self.stock_minimo:
+            return 'Proximo a gotarse'
+        return 'DISPONIBLE'
+
+    def save(self, *args, **kwargs):
+        self.estado = self.estado_producto()
+        super().save(*args, **kwargs)
+
