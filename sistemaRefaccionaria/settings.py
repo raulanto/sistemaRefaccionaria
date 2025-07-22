@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'inventario.apps.InventarioConfig',
     'simple_history',
+    'webpack_loader'
 
 ]
 
@@ -140,3 +141,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',  # Directorio donde Webpack guardará los bundles (dentro de `STATICFILES_DIRS`)
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),  # Ruta al archivo de stats de Webpack
+    }
+}

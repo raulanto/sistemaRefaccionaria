@@ -1,0 +1,22 @@
+{#body.html#}
+
+{% extends 'base/head.html' %}
+
+
+{% block body %}
+    <div id="layoutSidenav">
+        {% include 'base/sidenav.html' %}
+        <div id="layoutSidenav_content">
+            <main>
+                {% block headercontect %}
+
+                {% endblock %}
+                {% block content %}
+
+                {% endblock %}
+
+            </main>
+            {% include 'base/foooter.html' %}
+        </div>
+    </div>
+{% endblock %}

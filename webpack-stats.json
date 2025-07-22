@@ -1,0 +1,21 @@
+{
+  "status": "done",
+  "assets": {
+    "main-2f19f74cc50d1590797b.js": {
+      "name": "main-2f19f74cc50d1590797b.js",
+      "path": "C:\\DOCUMENTOS\\sistemaRefaccionaria\\static\\bundles\\main-2f19f74cc50d1590797b.js",
+      "publicPath": "/static/bundles/main-2f19f74cc50d1590797b.js"
+    },
+    "main-509ac5facc31b2f6f39d.js": {
+      "name": "main-509ac5facc31b2f6f39d.js",
+      "path": "C:\\DOCUMENTOS\\sistemaRefaccionaria\\static\\bundles\\main-509ac5facc31b2f6f39d.js",
+      "publicPath": "/static/bundles/main-509ac5facc31b2f6f39d.js"
+    }
+  },
+  "chunks": {
+    "main": [
+      "main-509ac5facc31b2f6f39d.js"
+    ]
+  },
+  "publicPath": "/static/bundles/"
+}

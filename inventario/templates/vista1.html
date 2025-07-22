@@ -1,0 +1,75 @@
+{#vista1#}
+
+{% extends 'base/body.html' %}
+
+{% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+    <div class="container-fluid mt-n10">
+        <div class="card">
+            <div class="card-header">Lista de productos</div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio Compra</th>
+                        <th>Precio Venta</th>
+                        <th>Precio Mayoreo</th>
+                        <th>Cantidad Mayoreo</th>
+                        <th>Cantidad Productos</th>
+                        <th>Modelo</th>
+                        <th>Categoria</th>
+                        <th>estado</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio Compra</th>
+                        <th>Precio Venta</th>
+                        <th>Precio Mayoreo</th>
+                        <th>Cantidad Mayoreo</th>
+                        <th>Cantidad Productos</th>
+                        <th>Modelo</th>
+                        <th>Categoria</th>
+                        <th>estado</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.nombre }}</td>
+
+                        <td>
+                            <button class="btn btn-primary">Editar</button>
+                            <button class="btn btn-danger">Eliminar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        // Call the dataTables jQuery plugin
+        $(document).ready(function () {
+            $('#dataTable').DataTable();
+        });
+
+        $(document).ready(function () {
+            $('#dataTableActivity').DataTable({
+                "order": [[0, 'desc']]
+            });
+        });
+
+    </script>
+
+{% endblock %}
