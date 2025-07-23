@@ -14,3 +14,10 @@ class IndexView(View):
         }
         return render(request, 'vista1.html', context=data)
 
+class ProveedoresView(View):
+     def get(self, request):
+        data= {
+            'titulo': 'Proveedores',
+            'mensaje': 'Bienvenido al sistema de Proveedores.',
+        }
+        return render(request, 'proveedores.html', context=data)
