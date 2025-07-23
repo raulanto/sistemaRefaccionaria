@@ -19,9 +19,9 @@
                         <th>Precio Mayoreo</th>
                         <th>Cantidad Mayoreo</th>
                         <th>Cantidad Productos</th>
-                        <th>Modelo</th>
                         <th>Categoria</th>
-                        <th>estado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
                     </thead>
                     <tfoot>
@@ -32,7 +32,6 @@
                         <th>Precio Mayoreo</th>
                         <th>Cantidad Mayoreo</th>
                         <th>Cantidad Productos</th>
-                        <th>Modelo</th>
                         <th>Categoria</th>
                         <th>estado</th>
                     </tr>
@@ -41,7 +40,13 @@
                     {% for producto in productos %}
                     <tr>
                         <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.precio_compra }}</td>
+                        <td>{{ producto.precio_venta }}</td>
+                        <td>{{ producto.precio_mayoreo }}</td>
+                        <td>{{ producto.cantidad_mayoreo }}</td>
+                        <td>{{ producto.stock }}</td>
+                        <td>{{ producto.categoria }}</td>
+                        <td>{{ producto.estado }}</td>
 
                         <td>
                             <button class="btn btn-primary">Editar</button>
