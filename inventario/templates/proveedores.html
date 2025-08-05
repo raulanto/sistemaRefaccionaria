@@ -1,11 +1,54 @@
 {% extends 'base/body.html'%}
 
-{% block headercontect %}
+{% block headercontent %}
 
-{% include 'base/header/overlapHeader.html'%}
+{% include 'base/header/overlapHeader.html' %}
 
 {% endblock %}
 
 {% block content %}
+
+<div class="container-fluid mt-n10">
+  <div class="card">
+    <div class="card-header">Lista de Proveedores</div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover" id="dataTable">
+        <thead>
+          <tr>
+            <th>NOMBRE</th>
+            <th>TELEFONO</th>
+            <th>CORREO ELECTRONICO</th>
+            <th>RFC</th>
+            <th>SITIO WEB</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th>NOMBRE</th>
+            <th>TELEFONO</th>
+            <th>CORREO ELECTRONICO</th>
+            <th>RFC</th>
+            <th>SITIO WEB</th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for proveedor in proveedorEmpresas %}
+          <tr>
+            <td>{{ proveedor.nombre }}</td>
+            <td>{{ proveedor.telefono }}</td>
+            <td>{{ proveedor.email }}</td>
+            <td>{{ proveedor.rfc }}</td>
+            <td>{{ proveedor.sitio_web }}</td>
+            <td>
+              <button class="btn btn-primary">Editar</button>
+              <button class="btn btn-danger">Eliminar</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 {% endblock%}

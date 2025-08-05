@@ -1,5 +1,10 @@
-{#vista1#} {% extends 'base/body.html' %} {% block headercontect %} {% include
-'base/header/overlapHeader.html' %} {% endblock %} {% block content %}
+{% extends 'base/body.html' %} {% block headercontent %}
+ {% include 'base/header/overlapHeader.html' %} {% endblock %} {% block content %}
+
+{% extends 'base/body.html' %} {% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
 <div class="container-fluid mt-n10">
   <div class="card">
     <div class="card-header">Lista de productos</div>
@@ -7,30 +12,30 @@
       <table class="table table-bordered table-hover" id="dataTable">
         <thead>
           <tr>
-            <th>CodigO</th>
-            <th>Nombre</th>
-            <th>Precio Compra</th>
-            <th>Precio Venta</th>
-            <th>Precio Mayoreo</th>
-            <th>Cantidad Mayoreo</th>
-            <th>Cantidad Productos</th>
-            <th>Categoria</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>CODIGO</th>
+            <th>NOMBRE</th>
+            <th>PRECIO COMPRA</th>
+            <th>PRECIO VENTA</th>
+            <th>PRECIO MAYOREO</th>
+            <th>CANTIDAD MAYOREO</th>
+            <th>CANTIDAD PRODUCTO</th>
+            <th>CATEGORIA</th>
+            <th>ESTADO</th>
+            <th>ACCIONES</th>
           </tr>
         </thead>
         <tfoot>
           <tr>
-            <th>Codigo</th>
+            <th>CODIGO</th>
             <th>Nombre</th>
-            <th>Precio Compra</th>
-            <th>Precio Venta</th>
-            <th>Precio Mayoreo</th>
-            <th>Cantidad Mayoreo</th>
-            <th>Cantidad Productos</th>
-            <th>Categoria</th>
-            <th>estado</th>
-            <th>Acciones</th>
+            <th>PRECIO COMPRA</th>
+            <th>PRECIO VENTA</th>
+            <th>PRECIO MAYOREO</th>
+            <th>CANTIDAD MAYOREO</th>
+            <th>Cantidad PRODUCTO</th>
+            <th>CATEGORIA</th>
+            <th>ESTADO</th>
+            <th>ACCIONES</th>
           </tr>
         </tfoot>
         <tbody>
@@ -78,4 +83,4 @@
   });
 </script>
 
-{% endblock %}
+{% endblock %}  

@@ -149,3 +149,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),  # Ruta al archivo de stats de Webpack
     }
 }
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
