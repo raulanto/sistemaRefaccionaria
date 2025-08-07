@@ -10,6 +10,9 @@
     <div class="container-fluid mt-n10">
         <div class="card">
             <div class="card-header">Lista de productos</div>
+            <div class="card-header-actions">
+                <a href="{% url 'inventario:crear_producto' %}">Crear producto</a>
+            </div>
             <div class="card-body">
                 <table class="table table-bordered table-hover" id="dataTable">
                     <thead>
@@ -60,6 +63,7 @@
                         <td>
                             <button class="btn btn-primary btn-sm">Editar</button>
                             <button class="btn btn-danger btn-sm">Eliminar</button>
+                            <a href="{% url 'inventario:mostrar_producto' producto.id %}" class="btn  btn-sm">Mostrar</a>
                         </td>
                     </tr>
                     {% endfor %}

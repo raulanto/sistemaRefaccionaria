@@ -1,0 +1,34 @@
+{% extends 'base/body.html' %}
+
+
+{% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid mt-n10">
+        <div class="card card-header-actions">
+            <div class="card-header">Nuevo Producto
+                <a class="btn btn-primary btn-sm" href="{% url 'inventario:index' %}">Volver</a>
+            </div>
+
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="label" for="nombre">
+                            <span class="label-text">Nombre</span>
+                        </label>
+                        {{ form.nombre }}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" type="submit"> Guardar</button>
+                        <button class="btn btn-warning text-black" type="reset">Resetear formulario</button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}
