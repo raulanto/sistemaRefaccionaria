@@ -1,10 +1,5 @@
-{% extends 'base/body.html' %} {% block headercontent %}
- {% include 'base/header/overlapHeader.html' %} {% endblock %} {% block content %}
-
-{% extends 'base/body.html' %} {% block headercontect %}
-    {% include 'base/header/overlapHeader.html' %}
-{% endblock %}
-{% block content %}
+{% extends 'base/body.html' %} {% block headercontect %} {% include
+'base/header/overlapHeader.html' %} {% endblock %} {% block content %}
 <div class="container-fluid mt-n10">
   <div class="card">
     <div class="card-header">Lista de productos</div>
@@ -52,8 +47,7 @@
               <span class="badge badge-success">{{ producto.stock }}</span>
               {% else %}
               <span class="badge badge-danger">Agotado</span>
-                {% endif %}
-
+              {% endif %}
             </td>
             <td>{{ producto.categoria }}</td>
             <td>{{ producto.estado }}</td>
@@ -83,4 +77,4 @@
   });
 </script>
 
-{% endblock %}  
+{% endblock %}
