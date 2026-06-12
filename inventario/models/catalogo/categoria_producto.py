@@ -3,10 +3,19 @@ from catalogo.baseModel import BaseModel
 from django.utils.translation import gettext_lazy as _
 
 
-
 class CategoriaProducto(BaseModel):
-    nombre = models.CharField(_("Nombre de categoría"), max_length=25, unique=True)
-    descripcion = models.TextField(_("Descripción"), blank=True)
+
+    nombre = models.CharField(
+        _("Nombre de categoría"),
+        max_length=60,
+        unique=True
+    )
+
+    descripcion = models.TextField(
+        _("Descripción"),
+        blank=True
+    )
+
     padre = models.ForeignKey(
         'self',
         on_delete=models.SET_NULL,

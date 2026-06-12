@@ -1,5 +1,15 @@
 {
     "cSpell.words": [
         "headercontent"
+    ],
+    "java.project.sourcePaths": [
+        "inventario"
+    ],
+    "python-envs.pythonProjects": [
+        {
+            "path": "inventario",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
     ]
 }

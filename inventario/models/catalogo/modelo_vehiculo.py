@@ -2,7 +2,7 @@
 from django.db import models
 from catalogo.baseModel import BaseModel
 from django.utils.translation import gettext_lazy as _
-from .marca_modelo import Marca
+from .marca_vehiculo import Marca
 
 
 class Modelo(BaseModel):

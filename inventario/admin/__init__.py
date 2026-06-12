@@ -1,4 +1,4 @@
-from .categoriaProducto_admin import CategoriaProductoNameAdmin
+from .categoriaProducto_admin import CategoriaProductoAdmin
 from .marca_admin import MarcaAdmin
 from .modelo_admin import ModeloAdmin
 from .unidadMedida_admin import UnidadMedidaAdmin

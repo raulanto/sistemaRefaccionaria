@@ -34,6 +34,7 @@
             <td>{{ proveedor.rfc }}</td>
             <td>{{ proveedor.sitio_web }}</td>
             <td>
+              <a class="btn btn-success" href="{% url 'inventario:mostrar_proveedor' proveedor.id %}">Detalle</a>
               <button class="btn btn-primary">Editar</button>
               <button class="btn btn-danger">Eliminar</button>
             </td>
