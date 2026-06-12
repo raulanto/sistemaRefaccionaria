@@ -7,7 +7,7 @@ app_name = 'inventario'
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'), 
-        path('producto/', IndexView.as_view(), name='producto'),
+    path('producto/', IndexView.as_view(), name='producto'),
 
     path('proveedores/', ProveedoresView.as_view(), name='proveedores'),  
     path('categorias/', CategoriasView.as_view(), name='categorias'), 
