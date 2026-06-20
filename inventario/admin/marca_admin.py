@@ -1,6 +1,6 @@
-from inventario.models.catalogo import Marca
+from inventario.models.catalogo import MarcaProducto
 from django.contrib import admin
 
-@admin.register(Marca)
-class MarcaAdmin(admin.ModelAdmin):
+@admin.register(MarcaProducto)
+class MarcaProductoAdmin(admin.ModelAdmin):
     pass

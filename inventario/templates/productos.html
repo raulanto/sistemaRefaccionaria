@@ -1,6 +1,4 @@
 {% extends 'base/body.html' %}
-
-
 {% block headercontect %}
     {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
@@ -61,6 +59,7 @@
               </td>
               <td>{{ producto.categoria }}</td>
               <td class="d-none d-md-table-cell">{{ producto.estado }}</td>
+              
               <td class="text-nowrap">
                 <a class="btn btn-success btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Detalle</a>
                 <a class="btn btn-primary btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Editar</a>

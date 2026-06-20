@@ -2,7 +2,7 @@ from django.db import models
 from catalogo.baseModel import BaseModel
 from django.utils.translation import gettext_lazy as _
 
-class Marca(BaseModel):
+class MarcaProducto(BaseModel):
     nombre = models.CharField(_("Nombre de Marca"), max_length=35, unique=True)
 
     class Meta:

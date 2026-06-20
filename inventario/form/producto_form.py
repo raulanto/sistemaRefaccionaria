@@ -54,18 +54,18 @@ class ProductoForm(forms.ModelForm):
                     "id": "unidad_medida",
                 }
             ),
-            "modelo": forms.Select(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Marca-Modelo",
-                    "id": "modelo",
-                }
-            ),
             "categoria": forms.Select(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Categoria",
                     "id": "categoria",
+                }
+            ),
+            "marca": forms.Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "marca",
+                    "id": "marca",
                 }
             ),
             "proveedor_principal": forms.Select(

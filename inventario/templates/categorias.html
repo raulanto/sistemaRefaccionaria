@@ -1,4 +1,5 @@
-{% extends 'base/body.html' %} {% block headercontect %}
+{% extends 'base/body.html' %}
+{% block headercontect %}
     {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
 {% block content %}
@@ -10,11 +11,13 @@
         <thead>
           <tr>
             <th>NOMBRE</th>
+            <th>ACCIONES</th>
           </tr>
         </thead>
         <tfoot>
           <tr>
             <th>NOMBRE</th>
+            <th>ACCIONES</th>
           </tr>
         </tfoot>
         <tbody>
@@ -34,4 +37,13 @@
   </div>
 </div>
 
-{% endblock%}
+{% endblock %} {% block script %}
+<script>
+  // Call the dataTables jQuery plugin
+  $(document).ready(function () {
+    $("#dataTable").DataTable();
+  });
+
+</script>
+
+{% endblock %}

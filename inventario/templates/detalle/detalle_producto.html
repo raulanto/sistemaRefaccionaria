@@ -21,9 +21,9 @@
       <p class="mb-3">
         <strong class="text-primary">Stock:</strong>
         {% if producto.stock > 0 %}
-        <span class="badge bg-success">{{ producto.stock }}</span>
+        <span class="badge bg-success text-white">{{ producto.stock }}</span>
         {% else %}
-        <span class="badge bg-danger">Agotado</span>
+        <span class="badge bg-danger text-white">Agotado</span>
         {% endif %}
       </p>
         {% if imagenes %}

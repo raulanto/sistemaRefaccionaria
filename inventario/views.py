@@ -15,7 +15,7 @@ class IndexView(View):
             "mensaje": "Bienvenido al sistema de inventario de refacciones.",
             "productos": productos,
         }
-        return render(request, "vista1.html", context=data)
+        return render(request, "productos.html", context=data)
 
 
 class ProveedoresView(View):
@@ -30,7 +30,6 @@ class ProveedoresView(View):
 
 
 class CategoriasView(View):
-
     def get(self, request):
         categoriaProducto = CategoriaProducto.objects.all()
         data = {
@@ -40,9 +39,18 @@ class CategoriasView(View):
         }
         return render(request, "categorias.html", context=data)
 
+class ContactoProveedorView(View):
+    def get(self, request):
+        contactoProveedores = ProveedorEmpresa.objects.all()
+        data = {
+            "titulo": "Contacto Proveedor",
+            "mensaje": "Bienvenido al sistema de contacto de proveedores.",
+            "contactoProveedores": contactoProveedores,
+        }
+        return render(request, "contacto_proveedor.html", context=data)
+
 
 def MostrarProductos(request, id_producto):
-
     producto = get_object_or_404(Producto, id=id_producto)
     imagenes = ProductoImagen.objects.filter(producto=producto).order_by("orden")
     data = {
@@ -59,7 +67,6 @@ def MostrarProveedores(request, id_proveedor):
         "titulo": "Detalle del Proveedor",
         "proveedorEmpresa": proveedorEmpresa,
     }
-
     return render(request, "detalle/detalle_proveedor.html", context=data)
 
 
@@ -76,8 +83,6 @@ class crearProducto(CreateView):
 
         return context
 
-
-
 def eliminar_producto_ajax(request, pk):
     if request.method == 'POST':
         producto = Producto.objects.get(pk=pk)
@@ -85,3 +90,4 @@ def eliminar_producto_ajax(request, pk):
         return JsonResponse({
             'estado': 'ok'
         })
+    

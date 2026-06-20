@@ -2,25 +2,8 @@
     <nav class="sidenav shadow-right sidenav-light">
         <div class="sidenav-menu">
             <div class="nav accordion" id="accordionSidenav">
-                <div class="sidenav-menu-heading">Inventario</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
-                    data-target="#collapseDashboards" aria-expanded="false" aria-controls="collapseDashboards">
-                    <div class="nav-link-icon"><i data-feather="activity"></i></div>
-                    Dashboards
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
-                </a>
-                <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
-                        <a class="nav-link" href="{% url 'inventario:index' %}">Productos</a>
-                        <a class="nav-link"href="{% url 'inventario:proveedores' %}">Proveedores</a>
-                        <a class="nav-link" href="{% url 'inventario:categorias' %}">Categorias</a>
-                    </nav>
-                </div>
-
-                <!--
-                <div class="sidenav-menu-heading">Interface</div>
+                <!-- Barra lateral dashboard!-->
+                <div class="sidenav-menu-heading">OPCIONES</div>
                 <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
                     data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                     <div class="nav-link-icon"><i data-feather="layout"></i></div>
@@ -31,9 +14,9 @@
                 </a>
                 <div class="collapse" id="collapseLayouts" data-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
-                        <a class="nav-link" href="layout-static.html">Static Navigation</a><a class="nav-link"
-                            href="layout-dark.html">Dark Sidenav</a><a class="nav-link" href="layout-rtl.html">RTL
-                            Layout</a><a class="nav-link collapsed" href="#" data-toggle="collapse"
+                        <a class="nav-link" href="layout-static.html">VENTAS</a>
+                        <a class="nav-link" href="layout-rtl.html">GRAFICA</a>
+                        <!-- <a class="nav-link collapsed" href="#" data-toggle="collapse"
                             data-target="#collapseLayoutsPageHeaders" aria-expanded="false"
                             aria-controls="collapseLayoutsPageHeaders">Page Headers
                             <div class="sidenav-collapse-arrow">
@@ -47,9 +30,31 @@
                                     href="header-breadcrumbs.html">Breadcrumbs</a><a class="nav-link"
                                     href="header-light.html">Light</a>
                             </nav>
-                        </div>
+                        </div> -->
                     </nav>
                 </div>
+
+
+                <!-- Barra lateral TABLA INVENTARIO!-->
+                <div class="sidenav-menu-heading">INVENTARIO</div>
+                <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
+                    data-target="#collapseDashboards" aria-expanded="false" aria-controls="collapseDashboards">
+                    <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                    TABLAS
+                    <div class="sidenav-collapse-arrow">
+                        <i class="fas fa-angle-down"></i>
+                    </div>
+                </a>
+                <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
+                        <a class="nav-link" href="{% url 'inventario:index' %}">Productos</a>
+                        <a class="nav-link" href="{% url 'inventario:proveedores' %}">Proveedores</a>
+                        <a class="nav-link" href="{% url 'inventario:categorias' %}">Categorias</a>
+                        <a class="nav-link" href="{% url 'inventario:contacto_proveedor' %}">Contacto Proveedor</a>
+                    </nav>
+                </div>
+
+                <!--
                 <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
                     data-target="#collapseComponents" aria-expanded="false" aria-controls="collapseComponents">
                     <div class="nav-link-icon"><i data-feather="package"></i></div>

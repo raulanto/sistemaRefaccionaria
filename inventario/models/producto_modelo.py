@@ -6,7 +6,7 @@ from .catalogo.categoria_producto import CategoriaProducto
 from .contactoProvedor_modelo import ContactoProveedor
 from .provedorEmpresa_modelo import ProveedorEmpresa
 from django.core.validators import MinValueValidator
-from .catalogo import Modelo,Marca,UnidadMedida
+from .catalogo import UnidadMedida,MarcaProducto
 
 
 class Producto(BaseModel):
@@ -74,12 +74,11 @@ class Producto(BaseModel):
         verbose_name=_("Unidad de medida")
     )
 
-    modelo = models.ForeignKey(
-        Modelo,
+    marca = models.ForeignKey(
+        MarcaProducto,
         on_delete=models.PROTECT,
         related_name='productos',
-        verbose_name=_("Modelo"),
-        help_text=_("Marca - modelo")
+        verbose_name=_("Marca del producto")
     )
 
     categoria = models.ForeignKey(
