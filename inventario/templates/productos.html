@@ -22,8 +22,8 @@
               <th>PRECIO MAYOREO</th>
               <th>CANTIDAD MAYOREO</th>
               <th>CANTIDAD PRODUCTO</th>
+              <th>ESTADO</th>
               <th>CATEGORIA</th>
-              <th class="d-none d-md-table-cell">ESTADO</th>
               <th>ACCIONES</th>
             </tr>
           </thead>
@@ -35,9 +35,9 @@
               <th>PRECIO VENTA</th>
               <th>PRECIO MAYOREO</th>
               <th>CANTIDAD MAYOREO</th>
-              <th>Cantidad PRODUCTO</th>
+              <th>CANTIDAD PRODUCTO</th>
+              <th>ESTADO</th>
               <th>CATEGORIA</th>
-              <th class="d-none d-md-table-cell">ESTADO</th>
               <th>ACCIONES</th>
             </tr>
           </tfoot>
@@ -51,18 +51,24 @@
               <td>{{ producto.precio_mayoreo }}</td>
               <td>{{ producto.cantidad_mayoreo }}</td>
               <td>
-                {% if producto.stock > 0%}
+                {% if producto.stock > 0 %}
                 <span class="badge badge-success">{{ producto.stock }}</span>
                 {% else %}
                 <span class="badge badge-danger">Agotado</span>
                 {% endif %}
               </td>
+              <td>
+                <span class="badge 
+                {% if producto.estado == 'Disponible' %}badge-success
+                {% elif producto.estado == 'Proximo Agotarse' %}badge-warning
+                {% else %}badge-danger
+                {% endif %}">{{ producto.estado }}
+                </span>
+              </td>
               <td>{{ producto.categoria }}</td>
-              <td class="d-none d-md-table-cell">{{ producto.estado }}</td>
-              
               <td class="text-nowrap">
                 <a class="btn btn-success btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Detalle</a>
-                <a class="btn btn-primary btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Editar</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'inventario:editar_producto' producto.id %}">Editar</a>
                 <button onclick="alertaEliminar('{{producto.id}}')" class="btn btn-danger btn-sm">Eliminar</button>
               </td>
             </tr>

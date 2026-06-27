@@ -1,0 +1,201 @@
+{% extends 'base/body.html' %} {% block content %}
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <!-- 🟦 PRODUCTOS -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Punto de Venta</div>
+
+                <div class="card-body p-2">
+                    <!-- 🔍 BUSCADOR -->
+                    <input type="text" id="buscador" class="form-control mb-2"
+                        placeholder="Buscar por código o nombre..." />
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-hover" id="tablaProductos">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>COD</th>
+                                    <th>NOMBRE</th>
+                                    <th>PRECIO</th>
+                                    <th>STOCK</th>
+                                    <th>CANT</th>
+                                    <th>ACCION</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for producto in productos %}
+                                <tr>
+                                    <td>{{ producto.codigo }}</td>
+                                    <td>{{ producto.nombre }}</td>
+                                    <td>{{ producto.precio_venta }}</td>
+
+                                    <td>{{ producto.stock }}</td>
+
+                                    <td>
+                                        <input type="number" id="qty-{{ producto.id }}" value="1" min="1"
+                                            class="form-control form-control-sm" style="width: 70px" />
+                                    </td>
+
+                                    <td>
+                                        <button class="btn btn-primary btn-sm"
+                                            onclick="agregar('{{ producto.id }}','{{ producto.nombre }}','{{ producto.precio_venta }}')">
+                                            +
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🟩 CARRITO -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">CARRITO</div>
+
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cant</th>
+                                <th>Sub</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="carrito"></tbody>
+                    </table>
+
+                    <hr />
+
+                    <h3>Total: $<span id="total">0.00</span></h3>
+
+                    <button class="btn btn-success w-100 mt-2">COBRAR</button>
+
+                    <button class="btn btn-danger w-100 mt-2" onclick="limpiar()">
+                        LIMPIAR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block script %}
+
+<script>
+    let carrito = [];
+    let total = 0;
+
+    function agregar(id, nombre, precio) {
+        let qty = document.getElementById("qty-" + id).value;
+        qty = parseInt(qty);
+
+        if (qty <= 0) return;
+
+        let subtotal = precio * qty;
+
+        let item = carrito.find((p) => p.id === id);
+
+        if (item) {
+            item.cantidad += qty;
+            item.subtotal += subtotal;
+        } else {
+            carrito.push({
+                id: id,
+                nombre: nombre,
+                cantidad: qty,
+                subtotal: subtotal,
+            });
+        }
+
+        render();
+    }
+
+    function actualizarCantidad(id, value) {
+        let item = carrito.find((p) => p.id === id);
+
+        if (!item) return;
+
+        item.cantidad = parseInt(value);
+
+        if (item.cantidad <= 0) {
+            carrito = carrito.filter((p) => p.id !== id);
+        }
+
+        render();
+    }
+
+    function render() {
+        let html = "";
+        total = 0;
+
+        carrito.forEach((p) => {
+            total += p.subtotal;
+
+            html += `
+            <tr>
+                <td>${p.nombre}</td>
+                <td style="width:80px;">
+                    <input 
+                        type="number"
+                        min="1"
+                        value="${p.cantidad}"
+                        class="form-control form-control-sm"
+                        onchange="actualizarCantidad('${p.id}', this.value)"
+                    >
+                </td>
+                <td>$${p.subtotal.toFixed(2)}</td>
+                 <td>
+            <button 
+                class="btn btn-danger btn-sm"
+                onclick="eliminar('${p.id}')">
+                X
+            </button>
+        </td>
+            </tr>
+        `;
+        });
+
+        document.getElementById("carrito").innerHTML = html;
+        document.getElementById("total").innerText = total.toFixed(2);
+    }
+
+    function limpiar() {
+        carrito = [];
+        total = 0;
+        render();
+    }
+
+    /* 🔍 BUSCADOR */
+    document.getElementById("buscador").addEventListener("keyup", function () {
+        let filtro = this.value.toLowerCase().trim();
+        let filas = document.querySelectorAll("#tablaProductos tbody tr");
+
+        filas.forEach((fila) => {
+            let codigo = fila.children[0].textContent.toLowerCase(); // COD
+            let nombre = fila.children[1].textContent.toLowerCase(); // NOMBRE
+
+            if (codigo.includes(filtro) || nombre.includes(filtro)) {
+                fila.style.display = "";
+            } else {
+                fila.style.display = "none";
+            }
+        });
+    });
+
+    function eliminar(id){
+
+    carrito = carrito.filter(p => p.id !== id);
+
+    render();
+}
+</script>
+
+{% endblock %}

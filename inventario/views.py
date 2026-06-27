@@ -1,17 +1,20 @@
 from django.views import View
-from django.shortcuts import render, get_object_or_404
-from django.views.generic.edit import CreateView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic.edit import CreateView, UpdateView
+from inventario.models.catalogo.marca_producto import MarcaProducto
 from .form.producto_form import ProductoForm
 from django.http import JsonResponse
+from django.db.models import F
+from django.views.generic import ListView
 
-from .models import Producto, ProveedorEmpresa, CategoriaProducto, ProductoImagen
+from .models import Producto, ProveedorEmpresa, CategoriaProducto, ProductoImagen, ContactoProveedor
 
 
 class IndexView(View):
     def get(self, request):
         productos = Producto.objects.all()
         data = {
-            "titulo": "Sistema de Inventario",
+         "titulo": "Sistema de Inventario",
             "mensaje": "Bienvenido al sistema de inventario de refacciones.",
             "productos": productos,
         }
@@ -90,4 +93,50 @@ def eliminar_producto_ajax(request, pk):
         return JsonResponse({
             'estado': 'ok'
         })
+        
+class ProductoUpdateView(UpdateView):
+    model = Producto
+    form_class = ProductoForm
+    template_name = 'crud/crear_producto.html'
+    success_url = "/producto/"
     
+class ReportesView(View):
+    def get(self, request):
+        total_productos = Producto.objects.count()
+
+        total_stock_bajo = Producto.objects.filter(
+            stock__lte=F('stock_minimo')
+        ).count()
+
+        total_agotados = Producto.objects.filter(stock=0).count()
+        total_marcas = MarcaProducto.objects.count()
+        total_proveedores = ProveedorEmpresa.objects.count()
+        total_categorias = CategoriaProducto.objects.count()
+        total_contactos = ContactoProveedor.objects.count()
+        productos_con_iva = Producto.objects.filter(tiene_iva=True).count()
+        productos = Producto.objects.all()[:5]
+        
+
+        context = {
+            "titulo": "Dashboard",
+            "total_productos": total_productos,
+            "total_stock_bajo": total_stock_bajo,
+            "total_agotados": total_agotados,
+            "total_marcas": total_marcas,
+            "total_proveedores": total_proveedores,
+            "total_categorias": total_categorias,
+            "total_contactos": total_contactos,
+            "productos_con_iva": productos_con_iva,
+            "productos": productos,   
+        }
+
+        return render(request, "reportes/reportes.html", context)
+
+def VentaView(request):
+    productos = Producto.objects.all()
+    data = {
+        "titulo": "Venta de Productos",
+        "mensaje": "Bienvenido al sistema de venta de productos.",
+        "productos": productos,
+    }
+    return render(request, "venta.html", context=data)
