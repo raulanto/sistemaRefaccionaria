@@ -5,3 +5,6 @@ from .provedorEmpresa_modelo import ProveedorEmpresa
 from .contactoProvedor_modelo import ContactoProveedor
 from .producto_modelo import Producto
 from .productoImagen_modelo import ProductoImagen
+from .venta_modelo import Venta
+from .detalleVenta_modelo import DetalleVenta
+from .configuracionTicket_modelo import ConfiguracionTicket

@@ -7,7 +7,11 @@
   <div class="card card-header-actions">
     <div class="card-header">
       Lista de productos
-      <a class="btn btn-primary btn-sn" href=" {% url 'inventario:crear_producto' %}">Nuevo Producto</a>
+      <a
+        class="btn btn-primary btn-sn"
+        href=" {% url 'inventario:crear_producto' %}"
+        >Nuevo Producto</a
+      >
     </div>
     <div class="card-header-actions"></div>
     <div class="card-body">
@@ -58,18 +62,29 @@
                 {% endif %}
               </td>
               <td>
-                <span class="badge 
-                {% if producto.estado == 'Disponible' %}badge-success
-                {% elif producto.estado == 'Proximo Agotarse' %}badge-warning
-                {% else %}badge-danger
-                {% endif %}">{{ producto.estado }}
+                <span
+                  class="badge {% if producto.estado == 'Disponible' %}badge-success {% elif producto.estado == 'Proximo Agotarse' %}badge-warning {% else %}badge-danger {% endif %}"
+                  >{{ producto.estado }}
                 </span>
               </td>
               <td>{{ producto.categoria }}</td>
               <td class="text-nowrap">
-                <a class="btn btn-success btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Detalle</a>
-                <a class="btn btn-primary btn-sm" href="{% url 'inventario:editar_producto' producto.id %}">Editar</a>
-                <button onclick="alertaEliminar('{{producto.id}}')" class="btn btn-danger btn-sm">Eliminar</button>
+                <a
+                  class="btn btn-success btn-sm"
+                  href="{% url 'inventario:mostrar_productos' producto.id %}"
+                  >Detalle</a
+                >
+                <a
+                  class="btn btn-primary btn-sm"
+                  href="{% url 'inventario:editar_producto' producto.id %}"
+                  >Editar</a
+                >
+                <button
+                  onclick="alertaEliminar('{{producto.id}}')"
+                  class="btn btn-danger btn-sm"
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
             {% endfor %}
@@ -116,11 +131,18 @@
           .then((data) => {
             if (data.estado == "ok") {
               Swal.fire({
-                title: "Eliminado!",
+                title: "Eliminado",
                 text: "El producto fue eliminado correctamente",
                 icon: "success",
               });
+
               document.getElementById("fila-" + id).remove();
+            } else {
+              Swal.fire({
+                title: "No se puede eliminar",
+                text: data.mensaje,
+                icon: "error",
+              });
             }
           });
       }

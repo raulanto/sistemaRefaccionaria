@@ -16,7 +16,8 @@
                     <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
                         <a class="nav-link" href="{% url 'inventario:reportes' %}">DASHBOARD</a>
                         <a class="nav-link" href="{% url 'inventario:venta' %}">PUNTO DE VENTA</a>
-                        <a class="nav-link" href="layout-static.html">VENTAS</a>
+                        <a class="nav-link" href="{% url 'inventario:ventas_historial' %}">HISTORIAL DE VENTAS</a>
+                        <a class="nav-link" href="{% url 'inventario:configuracion_ticket' %}">Configuracion Ticket</a>
                         <a class="nav-link" href="layout-rtl.html">GRAFICA</a>
                         <!-- <a class="nav-link collapsed" href="#" data-toggle="collapse"
                             data-target="#collapseLayoutsPageHeaders" aria-expanded="false"
@@ -49,8 +50,8 @@
                 </a>
                 <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
-                        <a class="nav-link" href="{% url 'inventario:index' %}">Productos</a>
-                        <a class="nav-link" href="{% url 'inventario:proveedores' %}">Proveedores</a>
+                        <a class="nav-link" href="{% url 'inventario:producto' %}">Productos</a>
+                        <a class="nav-link" href="{% url 'inventario:proveedorEmpresaListar' %}">Proveedores</a>
                         <a class="nav-link" href="{% url 'inventario:categorias' %}">Categorias</a>
                         <a class="nav-link" href="{% url 'inventario:contacto_proveedor' %}">Contacto Proveedor</a>
                     </nav>

@@ -1,113 +1,159 @@
-{% extends 'base/body.html' %}
-
-{% block headercontect %}
-{% include 'base/header/overlapHeader.html' %}
+{% extends 'base/body.html' %} {% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
-
-
 {% block content %}
 
 <div class="container-fluid mt-n10">
-    <div class="card card-header-actions">
-        <div class="card-header">Nuevo producto
-            <a class="btn btn-primary btn-sn" href="{% url 'inventario:index' %}">volver</a>
+
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-box"></i>
+                Nuevo Producto
+            </h4>
+            <a href="{% url 'inventario:index' %}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i>
+                Volver
+            </a>
         </div>
         <div class="card-body">
-            <form method="post">
+            <form method="POST">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label class="label" for="codigo">
-                        <span class="label-text">Codigo</span>
-                    </label>
-                    {{ form.codigo}}
+                <!-- ========================= -->
+                <!-- INFORMACIÓN GENERAL -->
+                <!-- ========================= -->
+
+                <h5 class="text-primary mb-3">
+                    Información General
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Código</label>
+                        {{ form.codigo }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Código de Barras</label>
+                        {{ form.codigo_barras }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Estado</label>
+                        {{ form.estado }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="label" for="nombre">
-                        <span class="label-text">Nombre</span>
-                    </label>
-                    {{ form.nombre}}
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label>Nombre del Producto</label>
+                        {{ form.nombre }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="label" for="precio_compra">
-                        <span class="label-text">Descripcion del Producto</span>
-                    </label>
-                    {{ form.descripcion}}
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label>Descripción</label>
+                        {{ form.descripcion }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="label" for="precio_compra">
-                        <span class="label-text">Precio Compra</span>
-                    </label>
-                    {{ form.precio_compra}}
+                <hr>
+
+                <!-- ========================= -->
+                <!-- PRECIOS -->
+                <!-- ========================= -->
+
+                <h5 class="text-primary mb-3">
+                    Precios
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Precio Compra</label>
+                        {{ form.precio_compra }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Precio Venta</label>
+                        {{ form.precio_venta }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Precio Mayoreo</label>
+                        {{ form.precio_mayoreo }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="label" for="precio_venta">
-                        <span class="label-text">Precio venta</span>
-                    </label>
-                    {{ form.precio_venta}}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Cantidad Mayoreo</label>
+                        {{ form.cantidad_mayoreo }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="label" for="precio_mayoreo">
-                        <span class="label-text">Precio Mayoreo</span>
-                    </label>
-                    {{ form.precio_mayoreo}}
+                <hr>
+
+                <!-- ========================= -->
+                <!-- INVENTARIO -->
+                <!-- ========================= -->
+
+                <h5 class="text-primary mb-3">
+                    Inventario
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Stock Actual</label>
+                        {{ form.stock }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Stock Mínimo</label>
+                        {{ form.stock_minimo }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Unidad de Medida</label>
+                        {{ form.unidad_medida }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="label" for="cantidad_mayoreo">
-                        <span class="label-text">Cantidad Mayoreo</span>
-                    </label>
-                    {{ form.cantidad_mayoreo}}
+                <hr>
+
+                <!-- ========================= -->
+                <!-- CLASIFICACIÓN -->
+                <!-- ========================= -->
+
+                <h5 class="text-primary mb-3">
+                    Clasificación
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Categoría</label>
+                        {{ form.categoria }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Marca</label>
+                        {{ form.marca }}
+                    </div>
                 </div>
-                 <div class="form-group">
-                    <label class="label" for="stock">
-                        <span class="label-text">Stock Actual</span>
-                    </label>
-                    {{ form.stock}}
+                <hr>
+
+                <!-- ========================= -->
+                <!-- PROVEEDOR -->
+                <!-- ========================= -->
+
+                <h5 class="text-primary mb-3">
+                    Proveedor
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Proveedor Principal</label>
+                        {{ form.proveedor_principal }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Contacto del Proveedor</label>
+                        {{ form.contacto_proveedor }}
+                    </div>
                 </div>
-                 <div class="form-group">
-                    <label class="label" for="stock_minimo">
-                        <span class="label-text">Stock Minimo</span>
-                    </label>
-                    {{ form.stock_minimo}}
-                </div>
-                <div class="form-group">
-                    <label class="label" for="unidad_medida">
-                        <span class="label-text">Unidad Medida</span>
-                    </label>
-                    {{ form.unidad_medida}}
-                </div>
-                <div class="form-group">
-                    <label class="label" for="categoria">
-                        <span class="label-text">Categoria</span>
-                    </label>
-                    {{ form.categoria}}
-                </div>
-                <div class="form-group">
-                    <label class="label" for="marca">
-                        <span class="label-text">marca</span>
-                    </label>
-                    {{ form.marca}}
-                </div>
-                <div class="form-group">
-                    <label class="label" for="proveedor_principal">
-                        <span class="label-text">Proveedor Principal</span>
-                    </label>
-                    {{ form.proveedor_principal}}
-                </div>
-                <div class="form-group">
-                    <label class="label" for="contacto_proveedor">
-                        <span class="label-text">Contacto del proveedor</span>
-                    </label>
-                    {{ form.contacto_proveedor}}
-                </div>
-                <div class="form-group">
-                    <label class="label" for="estado">
-                        <span class="label-text">Estado del Producto</span>
-                    </label>
-                    {{ form.estado}}
-                </div>
-                <div class="card-actions">
-                    <button type="submit">Guardar</button>
-                    <button type="reset">resetear</button>
+                <hr>
+                <!-- BOTONES -->
+                <div class="text-end">
+                    <button type="reset" class="btn btn-warning">
+                        <i class="fas fa-eraser"></i>
+                        Limpiar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i>
+                        Guardar Producto
+                    </button>
                 </div>
             </form>
         </div>
@@ -115,3 +161,4 @@
 </div>
 
 {% endblock %}
+

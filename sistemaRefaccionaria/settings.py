@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'inventario.apps.InventarioConfig',
     'simple_history',
-    'webpack_loader'
+    'webpack_loader',
+    'catalogo',
 
 ]
 

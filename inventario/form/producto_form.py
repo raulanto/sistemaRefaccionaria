@@ -63,7 +63,7 @@ class ProductoForm(forms.ModelForm):
             ),
             "marca": forms.Select(
                 attrs={
-                    "class": "form-control",
+                    "class": "form-select shadow-sm",
                     "placeholder": "marca",
                     "id": "marca",
                 }

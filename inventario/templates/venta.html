@@ -1,145 +1,219 @@
-{% extends 'base/body.html' %} {% block content %}
+{% extends 'base/body.html' %} 
+  {% block headercontect %} 
+{% include 'base/header/overlapHeader.html' %} 
+{% endblock %} {% block content %}
 
-<div class="container-fluid mt-3">
-    <div class="row">
-        <!-- 🟦 PRODUCTOS -->
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Punto de Venta</div>
+<div class="container-fluid mt-n10">
+  <div class="row">
+    <!-- 🟦 PRODUCTOS -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">Punto de Venta</div>
 
-                <div class="card-body p-2">
-                    <!-- 🔍 BUSCADOR -->
-                    <input type="text" id="buscador" class="form-control mb-2"
-                        placeholder="Buscar por código o nombre..." />
+        <div class="card-body p-2">
+          <!-- 🔍 BUSCADOR -->
+          <input
+            type="text"
+            id="buscador"
+            class="form-control mb-2"
+            placeholder="Buscar por código o nombre..."
+          />
 
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered table-hover" id="tablaProductos">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>COD</th>
-                                    <th>NOMBRE</th>
-                                    <th>PRECIO</th>
-                                    <th>STOCK</th>
-                                    <th>CANT</th>
-                                    <th>ACCION</th>
-                                </tr>
-                            </thead>
+          <div class="table-responsive">
+            <table
+              class="table table-sm table-bordered table-hover"
+              id="tablaProductos"
+            >
+              <thead class="table-dark">
+                <tr>
+                  <th>COD</th>
+                  <th>NOMBRE</th>
+                  <th>PRECIO</th>
+                  <th>STOCK</th>
+                  <th>CANT</th>
+                  <th>ACCION</th>
+                </tr>
+              </thead>
 
-                            <tbody>
-                                {% for producto in productos %}
-                                <tr>
-                                    <td>{{ producto.codigo }}</td>
-                                    <td>{{ producto.nombre }}</td>
-                                    <td>{{ producto.precio_venta }}</td>
+              <tbody>
+                {% for producto in productos %}
+                <tr>
+                  <td>{{ producto.codigo }}</td>
+                  <td>{{ producto.nombre }}</td>
+                  <td>{{ producto.precio_venta }}</td>
 
-                                    <td>{{ producto.stock }}</td>
+                  <td>{{ producto.stock }}</td>
 
-                                    <td>
-                                        <input type="number" id="qty-{{ producto.id }}" value="1" min="1"
-                                            class="form-control form-control-sm" style="width: 70px" />
-                                    </td>
+                  <td>
+                    <input
+                      type="number"
+                      id="qty-{{ producto.id }}"
+                      value="1"
+                      min="1"
+                      class="form-control form-control-sm"
+                      style="width: 70px"
+                    />
+                  </td>
 
-                                    <td>
-                                        <button class="btn btn-primary btn-sm"
-                                            onclick="agregar('{{ producto.id }}','{{ producto.nombre }}','{{ producto.precio_venta }}')">
-                                            +
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 🟩 CARRITO -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-success text-white">CARRITO</div>
-
-                <div class="card-body">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cant</th>
-                                <th>Sub</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="carrito"></tbody>
-                    </table>
-
-                    <hr />
-
-                    <h3>Total: $<span id="total">0.00</span></h3>
-
-                    <button class="btn btn-success w-100 mt-2">COBRAR</button>
-
-                    <button class="btn btn-danger w-100 mt-2" onclick="limpiar()">
-                        LIMPIAR
+                  <td>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      onclick="agregar('{{ producto.id }}','{{ producto.nombre }}','{{ producto.precio_venta }}')"
+                    >
+                      +
                     </button>
-                </div>
-            </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- 🟩 CARRITO -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-success text-white">CARRITO</div>
+
+        <div class="card-body">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant</th>
+                <th>Precio</th>
+                <th>Sub</th>
+              </tr>
+            </thead>
+
+            <tbody id="carrito"></tbody>
+          </table>
+
+          <hr />
+
+          <h3>Total: $<span id="total">0.00</span></h3>
+
+          <button class="btn btn-success w-100 mt-2" onclick="cobrar()">
+            COBRAR
+          </button>
+          <button class="btn btn-danger w-100 mt-2" onclick="limpiar()">
+            LIMPIAR
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %} {% block script %}
 
 <script>
-    let carrito = [];
-    let total = 0;
+  let carrito = [];
+  let total = 0;
 
-    function agregar(id, nombre, precio) {
-        let qty = document.getElementById("qty-" + id).value;
-        qty = parseInt(qty);
+  function cobrar() {
+    if (carrito.length === 0) {
+      alert("El carrito está vacío.");
+      return;
+    }
 
-        if (qty <= 0) return;
-
-        let subtotal = precio * qty;
-
-        let item = carrito.find((p) => p.id === id);
-
-        if (item) {
-            item.cantidad += qty;
-            item.subtotal += subtotal;
+    fetch("/guardar_venta/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify({
+        carrito: carrito,
+        total: total, // Envía el valor de la variable global 'total'
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.ok) {
+          alert("¡Venta #" + data.venta_id + " guardada correctamente!");
+          carrito = [];
+          window.location.href = "/ventas_historial/"; // Redirige al historial automáticamente
         } else {
-            carrito.push({
-                id: id,
-                nombre: nombre,
-                cantidad: qty,
-                subtotal: subtotal,
-            });
+          alert("Error en el servidor: " + data.error);
         }
+      })
+      .catch((err) => {
+        alert("Ocurrió un error al procesar la petición de red.");
+      });
+  }
 
-        render();
+  function agregar(id, nombre, precio) {
+    let qty = document.getElementById("qty-" + id).value;
+    qty = parseInt(qty);
+
+    if (qty <= 0 || isNaN(qty)) return;
+
+    // Convertimos a número flotante para evitar textos
+    let precioFloat = parseFloat(precio);
+    let subtotal = precioFloat * qty;
+
+    let item = carrito.find((p) => p.id === id);
+
+    if (item) {
+      item.cantidad += qty;
+      item.subtotal += subtotal;
+    } else {
+      carrito.push({
+        id: id,
+        nombre: nombre,
+        precio: precioFloat, // 🟢 Agregamos el precio unitario individual
+        cantidad: qty,
+        subtotal: subtotal,
+      });
     }
 
-    function actualizarCantidad(id, value) {
-        let item = carrito.find((p) => p.id === id);
+    render();
+  }
 
-        if (!item) return;
+  function actualizarCantidad(id, value) {
+    let item = carrito.find((p) => p.id === id);
 
-        item.cantidad = parseInt(value);
+    if (!item) return;
 
-        if (item.cantidad <= 0) {
-            carrito = carrito.filter((p) => p.id !== id);
-        }
+    item.cantidad = parseInt(value);
 
-        render();
+    if (item.cantidad <= 0) {
+      carrito = carrito.filter((p) => p.id !== id);
     }
 
-    function render() {
-        let html = "";
-        total = 0;
+    render();
+  }
 
-        carrito.forEach((p) => {
-            total += p.subtotal;
+  // ==========================================
+  // ACTUALIZA EL PRECIO DEL PRODUCTO
+  // ==========================================
+  function actualizarPrecio(id, value) {
+    // Buscar producto
+    let item = carrito.find((p) => p.id === id);
 
-            html += `
+    if (!item) return;
+
+    // Cambiar precio
+    item.precio = parseFloat(value);
+
+    // Recalcular subtotal
+    item.subtotal = item.precio * item.cantidad;
+
+    // Volver a dibujar el carrito
+    render();
+  }
+
+  function render() {
+    let html = "";
+    total = 0;
+
+    carrito.forEach((p) => {
+      total += p.subtotal;
+
+      html += `
             <tr>
                 <td>${p.nombre}</td>
                 <td style="width:80px;">
@@ -151,6 +225,14 @@
                         onchange="actualizarCantidad('${p.id}', this.value)"
                     >
                 </td>
+                <td style="width:120px;">
+                    <input
+                      type="number"
+                      step="0.01"
+                      value="${p.precio}"
+                      class="form-control form-control-sm text-end"
+                      onchange="actualizarPrecio('${p.id}',this.value)">
+                </td>
                 <td>$${p.subtotal.toFixed(2)}</td>
                  <td>
             <button 
@@ -161,41 +243,40 @@
         </td>
             </tr>
         `;
-        });
-
-        document.getElementById("carrito").innerHTML = html;
-        document.getElementById("total").innerText = total.toFixed(2);
-    }
-
-    function limpiar() {
-        carrito = [];
-        total = 0;
-        render();
-    }
-
-    /* 🔍 BUSCADOR */
-    document.getElementById("buscador").addEventListener("keyup", function () {
-        let filtro = this.value.toLowerCase().trim();
-        let filas = document.querySelectorAll("#tablaProductos tbody tr");
-
-        filas.forEach((fila) => {
-            let codigo = fila.children[0].textContent.toLowerCase(); // COD
-            let nombre = fila.children[1].textContent.toLowerCase(); // NOMBRE
-
-            if (codigo.includes(filtro) || nombre.includes(filtro)) {
-                fila.style.display = "";
-            } else {
-                fila.style.display = "none";
-            }
-        });
     });
 
-    function eliminar(id){
+    document.getElementById("carrito").innerHTML = html;
+    document.getElementById("total").innerText = total.toFixed(2);
+  }
 
-    carrito = carrito.filter(p => p.id !== id);
+  function limpiar() {
+    carrito = [];
+    total = 0;
+    render();
+  }
+
+  /* 🔍 BUSCADOR */
+  document.getElementById("buscador").addEventListener("keyup", function () {
+    let filtro = this.value.toLowerCase().trim();
+    let filas = document.querySelectorAll("#tablaProductos tbody tr");
+
+    filas.forEach((fila) => {
+      let codigo = fila.children[0].textContent.toLowerCase(); // COD
+      let nombre = fila.children[1].textContent.toLowerCase(); // NOMBRE
+
+      if (codigo.includes(filtro) || nombre.includes(filtro)) {
+        fila.style.display = "";
+      } else {
+        fila.style.display = "none";
+      }
+    });
+  });
+
+  function eliminar(id) {
+    carrito = carrito.filter((p) => p.id !== id);
 
     render();
-}
+  }
 </script>
 
 {% endblock %}
