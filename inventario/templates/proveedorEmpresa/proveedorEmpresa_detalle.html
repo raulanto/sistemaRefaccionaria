@@ -1,0 +1,40 @@
+{% extends 'base/body.html' %} {% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card">
+    <div class="card-header">Informacion</div>
+    <div class="card-body">
+      <p class="mb-2">
+        <strong class="text-primary">Nombre:</strong>
+        <span class="text-dark">{{ proveedorEmpresa.nombre }}</span>
+      </p>
+      <p class="mb-2">
+        <strong class="text-primary">Telefono:</strong>
+        <span class="text-muted">{{ proveedorEmpresa.telefono }}</span>
+      </p>
+      <p class="mb-2">
+        <strong class="text-primary">Correo Electrónico:</strong>
+        <span class="text-muted">{{ proveedorEmpresa.email }}</span>
+      </p>
+      <p class="mb-3">
+        <strong class="text-primary">RFC:</strong>
+        <span class="text-muted">{{ proveedorEmpresa.rfc }}</span>
+      </p>
+      <p class="mb-3">
+        <strong class="text-primary">Sitio Web:</strong>
+        <span class="text-muted">{{ proveedorEmpresa.sitio_web }}</span>
+        {% if imagenes %}
+            {% for imagene in imagenes %}
+                <img src="{{ imagene.imagen.url }}">
+            {% endfor %}
+        {% else %}
+            <p>No hay imagen disponible.</p>
+        {% endif %}
+      
+      <a href="{% url 'inventario:proveedorEmpresaLista' %}" class="btn btn-outline-primary btn-sm">← Volver a la lista</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -8,9 +8,9 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0">
                 <i class="fas fa-box"></i>
-                Nuevo Proveedor
+                Nuevo Contacto del Proveedor
             </h4>
-            <a href="{% url 'inventario:proveedorEmpresaLista' %}" class="btn btn-secondary btn-sm">
+            <a href="{% url 'inventario:contactoProveedorLista' %}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left"></i>
                 Volver
             </a>
@@ -21,7 +21,11 @@
                 <!-- ========================= -->
                 <!-- INFORMACIÓN GENERAL -->
                 <!-- ========================= -->
-
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    {{ form.errors }}
+                </div>
+                {% endif %}
                 <h5 class="text-primary mb-3">
                     Información General
                 </h5>
@@ -31,8 +35,8 @@
                         {{ form.nombre }}
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label>Dirección</label>
-                        {{ form.direccion }}
+                        <label>Proveedor</label>
+                        {{ form.proveedor }}
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>telefono</label>
@@ -43,12 +47,12 @@
                         {{ form.email }}
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label>Sitio Web</label>
-                        {{ form.sitio_web }}
+                        <label>Puesto</label>
+                        {{ form.puesto }}
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label>RFC</label>
-                        {{ form.rfc }}
+                        <label>Tipo</label>
+                        {{ form.tipo }}
                     </div>
                 </div>
                 <hr>

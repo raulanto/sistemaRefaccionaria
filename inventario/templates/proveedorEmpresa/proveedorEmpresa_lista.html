@@ -1,0 +1,108 @@
+{% extends 'base/body.html' %}
+{% block headercontect %}
+{% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card card-header-actions">
+    <div class="card-header">Lista de Proveedores
+      <a class="btn btn-primary btn-sn" href=" {% url 'inventario:proveedorEmpresaCrear' %}">Nuevo Proveedor</a>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover" id="dataTable">
+        <thead>
+          <tr>
+            <th>NOMBRE</th>
+            <th>TELEFONO</th>
+            <th>CORREO ELECTRONICO</th>
+            <th>RFC</th>
+            <th>SITIO WEB</th>
+            <th>ACCIONES</th>
+
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th>NOMBRE</th>
+            <th>TELEFONO</th>
+            <th>CORREO ELECTRONICO</th>
+            <th>RFC</th>
+            <th>SITIO WEB</th>
+            <th>ACCIONES</th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for proveedor in proveedorEmpresas %}
+          <tr id="fila-{{ proveedor.id }}">
+            <td>{{ proveedor.nombre }}</td>
+            <td>{{ proveedor.telefono }}</td>
+            <td>{{ proveedor.email }}</td>
+            <td>{{ proveedor.rfc }}</td>
+            <td>{{ proveedor.sitio_web }}</td>
+            <td class="text-nowrap">
+              <a class="btn btn-primary btn-sm"
+                href="{% url 'inventario:proveedorEmpresaEditar' proveedor.id %}">Editar</a>
+              <a class="btn btn-success btn-sm"
+                href="{% url 'inventario:proveedorEmpresaDetalle' proveedor.id %}">Detalle</a>
+              <button onclick="alertaEliminar('{{proveedor.id}}','{{ proveedor.nombre }}')" class="btn btn-danger btn-sm">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block script %}
+<script>
+  // Call the dataTables jQuery plugin
+  $(document).ready(function () {
+    $("#dataTable").DataTable();
+  });
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function alertaEliminar(id, nombre) {
+    Swal.fire({
+      title: `¿Estás seguro de eliminar el proveedor "${nombre}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, borrar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("/eliminarProveedor/" + id + "/", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.estado == "ok") {
+              Swal.fire({
+                title: "Eliminado",
+                text: "El producto fue eliminado correctamente",
+                icon: "success",
+              });
+
+              document.getElementById("fila-" + id).remove();
+            } else {
+              Swal.fire({
+                title: "No se puede eliminar",
+                text: data.mensaje,
+                icon: "error",
+              });
+            }
+          });
+      }
+    });
+  }
+</script>
+{% endblock %}

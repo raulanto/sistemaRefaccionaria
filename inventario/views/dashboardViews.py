@@ -3,7 +3,7 @@ from django.views import View
 
 from inventario.models.catalogo.categoria_producto import CategoriaProducto
 from inventario.models.catalogo.marca_producto import MarcaProducto
-from inventario.models.contactoProvedor_modelo import ContactoProveedor
+from inventario.models.contactoProveedor_modelo import ContactoProveedor
 from inventario.models.producto_modelo import Producto
 from inventario.models.provedorEmpresa_modelo import ProveedorEmpresa
 from django.shortcuts import render, get_object_or_404, redirect

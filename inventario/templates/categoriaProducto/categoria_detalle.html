@@ -1,0 +1,17 @@
+{% extends 'base/body.html' %} {% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card">
+    <div class="card-header">Informacion</div>
+    <div class="card-body">
+      <p class="mb-2">
+        <strong class="text-primary">Nombre:</strong>
+        <span class="text-dark">{{ categoria.nombre }}</span>
+      </p>
+      <a href="{% url 'inventario:categoriaLista' %}" class="btn btn-outline-primary btn-sm">← Volver a la lista</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

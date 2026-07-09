@@ -5,15 +5,17 @@
 {% block content %}
 <div class="container-fluid mt-n10">
   <div class="card card-header-actions">
-    <div class="card-header">
-      Lista de productos
-      <a
-        class="btn btn-primary btn-sn"
-        href=" {% url 'inventario:crear_producto' %}"
-        >Nuevo Producto</a
-      >
+  <div class="card-header d-flex justify-content-between align-items-center">
+    Lista de productos
+    <div>
+      <a class="btn btn-primary btn-sm me-2" href="{% url 'inventario:crear_producto' %}">
+        Nuevo Producto
+      </a>
+      <a class="btn btn-success btn-sm" href="{% url 'inventario:exportarProductosExcel' %}">
+        <i class="fas fa-file-excel"> </i>Exportar a Excel
+      </a>
     </div>
-    <div class="card-header-actions"></div>
+  </div>
     <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered table-hover" id="dataTable">
@@ -63,28 +65,15 @@
               </td>
               <td>
                 <span
-                  class="badge {% if producto.estado == 'Disponible' %}badge-success {% elif producto.estado == 'Proximo Agotarse' %}badge-warning {% else %}badge-danger {% endif %}"
-                  >{{ producto.estado }}
+                  class="badge {% if producto.estado == 'Disponible' %}badge-success {% elif producto.estado == 'Proximo Agotarse' %}badge-warning {% else %}badge-danger {% endif %}">
+                  {{producto.estado }}
                 </span>
-              </td>
+                </td>
               <td>{{ producto.categoria }}</td>
               <td class="text-nowrap">
-                <a
-                  class="btn btn-success btn-sm"
-                  href="{% url 'inventario:mostrar_productos' producto.id %}"
-                  >Detalle</a
-                >
-                <a
-                  class="btn btn-primary btn-sm"
-                  href="{% url 'inventario:editar_producto' producto.id %}"
-                  >Editar</a
-                >
-                <button
-                  onclick="alertaEliminar('{{producto.id}}')"
-                  class="btn btn-danger btn-sm"
-                >
-                  Eliminar
-                </button>
+                <a class="btn btn-success btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Detalle</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'inventario:editar_producto' producto.id %}">Editar</a>
+                <button onclick="alertaEliminar('{{producto.id}}')" class="btn btn-danger btn-sm">Eliminar</button>
               </td>
             </tr>
             {% endfor %}

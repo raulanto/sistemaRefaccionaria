@@ -3,7 +3,7 @@ from catalogo.baseModel import BaseModel
 from django.utils.translation import gettext_lazy as _
 
 from .catalogo.categoria_producto import CategoriaProducto
-from .contactoProvedor_modelo import ContactoProveedor
+from .contactoProveedor_modelo import ContactoProveedor
 from .provedorEmpresa_modelo import ProveedorEmpresa
 from django.core.validators import MinValueValidator
 from .catalogo import UnidadMedida,MarcaProducto
