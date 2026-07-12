@@ -1,0 +1,146 @@
+{% extends 'base/body.html' %}
+{% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card shadow">about:blank#blocked
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Cierre de Caja</h4>
+      <button class="btn btn-danger" onclick="cerrarCaja()">
+        <i class="fas fa-cash-register"></i> Cerrar caja de hoy
+      </button>
+    </div>
+
+    <div class="card-body">
+      <!-- Ventas del día pendientes de cerrar -->
+      <div class="alert alert-info d-flex justify-content-between">
+        <span>Ventas pendientes de cierre: <strong>{{ ventas_pendientes.count }}</strong></span>
+        <span>Total: <strong>${{ total_pendiente }}</strong></span>
+      </div>
+
+      <!-- FILTRO POR FECHA -->
+      <form method="GET" class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label>Desde</label>
+          <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio|default:'' }}">
+        </div>
+        <div class="col-md-4">
+          <label>Hasta</label>
+          <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin|default:'' }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-search"></i> Filtrar
+          </button>
+        </div>
+      </form>
+
+      <!-- TABLA DE CIERRES -->
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Fecha inicio</th>
+            <th>Fecha fin</th>
+            <th># Ventas</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cierre in cierres %}
+          <tr style="cursor:pointer" onclick="verVentasDeCierre('|{{ cierre.id }}', this)">
+            <td>{{ cierre.fecha_inicio }}</td>
+            <td>{{ cierre.fecha_fin }}</td>
+            <td>{{ cierre.cantidad_ventas }}</td>
+            <td>${{ cierre.total_ventas }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-center">No hay cierres en ese rango de fechas.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- PANEL: ventas de un cierre seleccionado -->
+      <div id="panel-ventas" class="mt-4" style="display:none">
+        <h5>Ventas del cierre seleccionado</h5>
+        <table class="table table-sm table-bordered" id="tabla-ventas-cierre">
+          <thead><tr><th>ID Venta</th><th>Fecha</th><th>Total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- PANEL: productos de la venta seleccionada -->
+      <div id="panel-detalle" class="mt-4" style="display:none">
+        <h5>Productos vendidos</h5>
+        <table class="table table-sm table-striped" id="tabla-detalle-venta">
+          <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function cerrarCaja() {
+    Swal.fire({
+        title: "¿Cerrar la caja de hoy?",
+        text: "Se hará el corte con todas las ventas pendientes.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cerrar caja",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch("{% url 'inventario:cerrar_caja' %}", {
+                method: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.estado === "ok") {
+                    Swal.fire("Caja cerrada", `Total: $${data.total} (${data.cantidad} ventas)`, "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Aviso", data.mensaje, "info");
+                }
+            });
+        }
+    });
+}
+
+function verVentasDeCierre(cierreId) {
+    fetch(`/cierre_caja/${cierreId}/ventas/`)
+        .then(r => r.json())
+        .then(data => {
+            const tbody = document.querySelector("#tabla-ventas-cierre tbody");
+            tbody.innerHTML = "";
+            data.ventas.forEach(v => {
+                const fila = document.createElement("tr");
+                fila.style.cursor = "pointer";
+                fila.innerHTML = `<td>${v.id}</td><td>${v.fecha}</td><td>$${v.total}</td>`;
+                fila.onclick = () => verDetalleVenta(v.id);
+                tbody.appendChild(fila);
+            });
+            document.getElementById("panel-ventas").style.display = "block";
+            document.getElementById("panel-detalle").style.display = "none";
+        });
+}
+
+function verDetalleVenta(ventaId) {
+    fetch(`/venta/${ventaId}/detalle_ajax/`)
+        .then(r => r.json())
+        .then(data => {
+            const tbody = document.querySelector("#tabla-detalle-venta tbody");
+            tbody.innerHTML = "";
+            data.detalles.forEach(d => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `<td>${d.producto}</td><td>${d.cantidad}</td><td>$${d.precio}</td><td>$${d.subtotal}</td>`;
+                tbody.appendChild(fila);
+            });
+            document.getElementById("panel-detalle").style.display = "block";
+        });
+}
+</script>
+{% endblock %}
