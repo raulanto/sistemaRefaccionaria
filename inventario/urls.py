@@ -1,7 +1,7 @@
 from django.urls import path
-
 from inventario.views import cierreCajaViews
 from .views import productoViews, ProveedorListaView, CategoriaListaView, MostrarProductos, ProveedorDetalleView, crearProducto, ReportesView
+from .views import productoViews, ProveedorListaView, CategoriaListaView, MostrarProductos, ProveedorDetalleView, crearProducto, DashboardView
 from . import views
 from .views.proveedorViews import ProveedorCrearView, ProveedorEditarView
 
@@ -9,7 +9,7 @@ from .views.proveedorViews import ProveedorCrearView, ProveedorEditarView
 app_name = 'inventario'
 
 urlpatterns = [
-    path('', ReportesView.as_view(), name='index'), 
+    path('', DashboardView.as_view(), name='index'), 
     
     #PRODUCTO
     path('producto/', productoViews.ProductoView.as_view(), name='producto'),
@@ -55,7 +55,7 @@ urlpatterns = [
     path("configuracion_ticket/", views.configuracion_ticket, name="configuracion_ticket"),
     
     #DASHBOARD
-    path('stock-bajo/',views.ReportesView.as_view(),name='reportes'),
+    path('dashboard/dashboard',views.DashboardView.as_view(),name='dashboard'),
     
     #CIERRE DE CAJA
     path('cierre_caja/', cierreCajaViews.CierreCajaListView.as_view(), name='cierre_caja_lista'),
