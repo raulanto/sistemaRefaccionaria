@@ -1,0 +1,91 @@
+{% extends 'base/body.html' %}
+{% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card card-header-actions">
+    <div class="card-header">Lista de Categorias
+         <a class="btn btn-primary btn-sn" href="">Nueva Categoria</a>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover" id="dataTable">
+        <thead>
+          <tr>
+            <th>NOMBRE</th>
+            <th>ACCIONES</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th>NOMBRE</th>
+            <th>ACCIONES</th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for marca in marcaProductos %}
+          <tr id="fila-{{ marca.id }}" >
+            <td>{{ marca.nombre }}</td>
+            <td>
+              <a class="btn btn-success btn-sm" href="">Detalle</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block script %}
+<script>
+  // Call the dataTables jQuery plugin
+  $(document).ready(function () {
+    $("#dataTable").DataTable();
+  });
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function alertaEliminar(id, nombre) {
+    Swal.fire({
+      title: `¿Estás seguro de eliminar la categoría "${nombre}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, borrar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("/categoriaProducto/" + id + "/", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.estado == "ok") {
+              Swal.fire({
+                title: "Eliminado",
+                text: "El producto fue eliminado correctamente",
+                icon: "success",
+              });
+
+              document.getElementById("fila-" + id).remove();
+            } else {
+              Swal.fire({
+                title: "No se puede eliminar",
+                text: data.mensaje,
+                icon: "error",
+              });
+            }
+          });
+      }
+    });
+  }
+</script>
+
+{% endblock %}

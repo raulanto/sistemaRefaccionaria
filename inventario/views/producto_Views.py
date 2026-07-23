@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from inventario.form.producto_form import ProductoForm
+from inventario.forms.producto_form import ProductoForm
 from inventario.models.productoImagen_modelo import ProductoImagen
 from inventario.models.producto_modelo import Producto
 from django.views.generic.edit import CreateView, UpdateView
@@ -10,6 +10,8 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill
 from django.http import HttpResponse
 from inventario.models import Producto
+from django.http import JsonResponse
+from django.db.models import Q
 
 class ProductoView(View):
     def get(self, request):
@@ -116,3 +118,32 @@ def ExportarProdutosExcel(request):
     response["Content-Disposition"] = 'attachment; filename="productos.xlsx"'
     wb.save(response)
     return response
+
+def buscar_productos_ajax(request):
+    """
+    Busca productos por código o nombre para los buscadores del sistema.
+    GET /productos/buscar_ajax/?q=balata
+    """
+    q = request.GET.get('q', '').strip()
+
+    productos = Producto.objects.all()
+
+    if q:
+        productos = productos.filter(
+            Q(codigo__icontains=q) | Q(nombre__icontains=q)
+        )
+
+    productos = productos.order_by('nombre')[:20]
+
+    data = [
+        {
+            'id': p.id,
+            'codigo': p.codigo,
+            'nombre': p.nombre,
+            'precio': float(p.precio_venta),
+            'stock': p.stock,
+            'tiene_iva': p.tiene_iva,
+        }
+        for p in productos
+    ]
+    return JsonResponse({'productos': data})

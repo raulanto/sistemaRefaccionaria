@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from inventario.form.categoriaProducto_form import CategoriaProductoForm
+from inventario.forms.categoriaProducto_form import CategoriaProductoForm
 from inventario.models.catalogo.categoria_producto import CategoriaProducto
 from django.views.generic.edit import CreateView, UpdateView
 from django.db.models import F, ProtectedError

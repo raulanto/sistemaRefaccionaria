@@ -1,0 +1,222 @@
+{% extends 'base/body.html' %}
+{% load static %}
+{% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card shadow">
+    <div class="card-header bg-danger text-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span><i class="fas fa-arrow-up text-white"></i> Salida de Inventario</span>
+        <i class="fas fa-list"></i> Historial
+      </a>
+    </div>
+
+    <div class="card-body">
+
+      <!-- BUSCAR Y AGREGAR -->
+      <button type="button" class="btn btn-outline-danger btn-lg w-100 mb-3" id="btnAbrirBusqueda">
+        <i class="fas fa-search"></i> Buscar y agregar producto
+      </button>
+
+      <!-- LISTA DE PRODUCTOS AGREGADOS -->
+      <div id="listaVacia" class="text-center text-muted py-4 border rounded">
+        <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+        Aún no has agregado productos
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle" id="tablaProductos" style="display:none;">
+          <thead class="table-light small text-uppercase text-muted">
+            <tr>
+              <th>Producto</th>
+              <th style="width:90px;">Cantidad</th>
+              <th>Motivo</th>
+              <th>Observaciones</th>
+              <th style="width:40px;"></th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla"></tbody>
+        </table>
+      </div>
+
+      <hr>
+
+      <div class="d-grid d-md-flex justify-content-md-end gap-2">
+        <button type="button" class="btn btn-outline-secondary w-100 w-md-auto" onclick="location.reload()">
+          <i class="fas fa-eraser"></i> Limpiar todo
+        </button>
+        <button type="button" class="btn btn-danger btn-lg w-100 w-md-auto" id="btnRegistrar">
+          <i class="fas fa-save"></i> Registrar salida (<span id="contador">0</span>)
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 👇 Componente reutilizable del buscador -->
+{% include 'partials/buscarProductosAjax.html' %}
+
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/buscarProductoAjax.js' %}"></script>
+<script>
+  let items = [];       // [{producto_id, codigo, nombre, cantidad, stock, motivo, observaciones}]
+  let contadorId = 0;
+
+  const MOTIVOS_SALIDA = [
+    { value: 'MERMA', label: 'Merma / Daño' },
+    { value: 'DEVOLUCION_PROVEEDOR', label: 'Devolución a proveedor' },
+    { value: 'AJUSTE', label: 'Ajuste de inventario' },
+    { value: 'OTRO', label: 'Otro' },
+  ];
+
+  document.getElementById('btnAbrirBusqueda').addEventListener('click', function () {
+    BuscadorProducto.abrir(function (producto) {
+      agregarProducto(producto);
+    }, { soloConStock: true }); // en salida, solo productos con stock disponible
+  });
+
+  function agregarProducto(producto) {
+    // si ya está en la lista, solo enfoca su cantidad en vez de duplicar
+    const existente = items.find((i) => i.producto_id === producto.id);
+    if (existente) {
+      render();
+      document.getElementById(`cant-${existente.itemId}`).focus();
+      return;
+    }
+
+    items.push({
+      itemId: contadorId++,
+      producto_id: producto.id,
+      codigo: producto.codigo,
+      nombre: producto.nombre,
+      stock: producto.stock,
+      cantidad: 1,
+      motivo: 'MERMA',
+      observaciones: '',
+    });
+    render();
+  }
+
+  function actualizarCantidad(itemId, valor) {
+    const item = items.find((i) => i.itemId === itemId);
+    if (!item) return;
+    let cantidad = parseInt(valor);
+    if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
+    if (cantidad > item.stock) {
+      Swal.fire('Stock insuficiente', `Solo hay ${item.stock} unidades de ${item.nombre}.`, 'warning');
+      cantidad = item.stock;
+    }
+    item.cantidad = cantidad;
+    render();
+  }
+
+  function actualizarMotivo(itemId, valor) {
+    const item = items.find((i) => i.itemId === itemId);
+    if (item) item.motivo = valor;
+  }
+
+  function actualizarObservaciones(itemId, valor) {
+    const item = items.find((i) => i.itemId === itemId);
+    if (item) item.observaciones = valor;
+  }
+
+  function eliminarItem(itemId) {
+    items = items.filter((i) => i.itemId !== itemId);
+    render();
+  }
+
+  function render() {
+    const tabla = document.getElementById('tablaProductos');
+    const vacia = document.getElementById('listaVacia');
+    const cuerpo = document.getElementById('cuerpoTabla');
+
+    if (items.length === 0) {
+      tabla.style.display = 'none';
+      vacia.style.display = '';
+      document.getElementById('contador').innerText = '0';
+      return;
+    }
+    vacia.style.display = 'none';
+    tabla.style.display = '';
+
+    cuerpo.innerHTML = items.map((item) => `
+      <tr>
+        <td>
+          <span class="badge bg-light text-dark border me-1">${item.codigo}</span>
+          ${item.nombre}
+          <div class="small text-muted">Stock: ${item.stock}</div>
+        </td>
+        <td>
+          <input type="number" id="cant-${item.itemId}" class="form-control form-control-sm" min="1" max="${item.stock}"
+                 value="${item.cantidad}" onchange="actualizarCantidad(${item.itemId}, this.value)">
+        </td>
+        <td>
+          <select class="form-select form-select-sm" onchange="actualizarMotivo(${item.itemId}, this.value)">
+            ${MOTIVOS_SALIDA.map((m) => `<option value="${m.value}" ${m.value === item.motivo ? 'selected' : ''}>${m.label}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          <input type="text" class="form-control form-control-sm" placeholder="Opcional"
+                 value="${item.observaciones}" onchange="actualizarObservaciones(${item.itemId}, this.value)">
+        </td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-link text-danger p-0" onclick="eliminarItem(${item.itemId})">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('contador').innerText = items.length;
+  }
+
+  document.getElementById('btnRegistrar').addEventListener('click', function () {
+    if (items.length === 0) {
+      Swal.fire('Sin productos', 'Agrega al menos un producto antes de registrar.', 'info');
+      return;
+    }
+
+    Swal.fire({
+      title: `¿Registrar salida de ${items.length} producto${items.length > 1 ? 's' : ''}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      confirmButtonColor: '#d64545',
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      const payload = {
+        items: items.map((i) => ({
+          producto_id: i.producto_id,
+          cantidad: i.cantidad,
+          motivo: i.motivo,
+          observaciones: i.observaciones,
+        })),
+      };
+
+      fetch(window.location.pathname, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.estado === 'ok') {
+            Swal.fire('Listo', `Se registraron ${data.cantidad} salidas.`, 'success')
+              .then(() => location.reload());
+          } else {
+            Swal.fire('No se pudo registrar', data.mensaje, 'error');
+          }
+        });
+    });
+  });
+</script>
+{% endblock %}

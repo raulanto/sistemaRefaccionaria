@@ -101,6 +101,27 @@
                 </div>
             </div>
         </div>
+
+        <!-- ACCESOS RÁPIDOS -->
+        <div class="col-md-5">
+            <div class="card dashboard-card h-100">
+                <div class="card-header bg-white">
+                    <i class="fas fa-bolt text-primary"></i> Accesos rápidos
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a href="{% url 'inventario:venta' %}" class="btn btn-success">
+                        <i class="fas fa-cash-register"></i> Nueva Venta
+                    </a>
+                    <a href="{% url 'inventario:crear_producto' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </a>
+                    <a href="{% url 'inventario:cierre_caja_lista' %}" class="btn btn-outline-danger">
+                        <i class="fas fa-lock"></i> Cierre de Caja
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- SEGUNDA FILA: CATÁLOGO -->

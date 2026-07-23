@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from inventario.form.contactoProveedor_form import ContactoProveedorForm
+from inventario.forms.contactoProveedor_form import ContactoProveedorForm
 from inventario.models.contactoProveedor_modelo import ContactoProveedor
 from inventario.models.provedorEmpresa_modelo import ProveedorEmpresa
 from django.views.generic.edit import CreateView, UpdateView

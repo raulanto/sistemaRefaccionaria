@@ -3,59 +3,67 @@
         <div class="sidenav-menu">
             <div class="nav accordion" id="accordionSidenav">
                 <!-- Barra lateral dashboard!-->
-                <div class="sidenav-menu-heading">OPCIONES</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
-                    data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                <div class="sidenav-menu-heading">Opciones</div>
+                <a class="nav-link" href="{% url 'inventario:dashboard' %}">
                     <div class="nav-link-icon"><i data-feather="layout"></i></div>
-                    Layout
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
+                    Dashboard
                 </a>
-                <div class="collapse" id="collapseLayouts" data-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
-                        <a class="nav-link" href="{% url 'inventario:dashboard' %}">DASHBOARD</a>
-                        <a class="nav-link" href="{% url 'inventario:venta' %}">PUNTO DE VENTA</a>
-                        <a class="nav-link" href="{% url 'inventario:ventas_historial' %}">HISTORIAL DE VENTAS</a>
-                        <a class="nav-link" href="{% url 'inventario:configuracion_ticket' %}">Configuracion Ticket</a>
-                        <a class="nav-link" href="{% url 'inventario:cierre_caja_lista' %}">Cierre de Caja</a>
-                        <!-- <a class="nav-link collapsed" href="#" data-toggle="collapse"
-                            data-target="#collapseLayoutsPageHeaders" aria-expanded="false"
-                            aria-controls="collapseLayoutsPageHeaders">Page Headers
-                            <div class="sidenav-collapse-arrow">
-                                <i class="fas fa-angle-down"></i>
-                            </div>
-                        </a>
-                        <div class="collapse" id="collapseLayoutsPageHeaders" data-parent="#accordionSidenavLayout">
-                            <nav class="sidenav-menu-nested nav">
-                                <a class="nav-link" href="header-simplified.html">Simplified</a><a class="nav-link"
-                                    href="header-overlap.html">Content Overlap</a><a class="nav-link"
-                                    href="header-breadcrumbs.html">Breadcrumbs</a><a class="nav-link"
-                                    href="header-light.html">Light</a>
-                            </nav>
-                        </div> -->
-                    </nav>
-                </div>
-
-
-                <!-- Barra lateral TABLA INVENTARIO!-->
-                <div class="sidenav-menu-heading">INVENTARIO</div>
-                <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
-                    data-target="#collapseDashboards" aria-expanded="false" aria-controls="collapseDashboards">
-                    <div class="nav-link-icon"><i data-feather="activity"></i></div>
-                    TABLAS
-                    <div class="sidenav-collapse-arrow">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
+                <a class="nav-link" href="{% url 'inventario:venta' %}">
+                    <div class="nav-link-icon"><i data-feather="shopping-cart"></i></div>
+                    Punto de venta
                 </a>
-                <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
-                        <a class="nav-link" href="{% url 'inventario:producto' %}">Productos</a>
-                        <a class="nav-link" href="{% url 'inventario:proveedorEmpresaLista' %}">Proveedores</a>
-                        <a class="nav-link" href="{% url 'inventario:categoriaLista' %}">Categorias</a>
-                        <a class="nav-link" href="{% url 'inventario:contactoProveedorLista' %}">Contacto Proveedor</a>
-                    </nav>
-                </div>
+                <a class="nav-link" href="{% url 'inventario:ventas_historial' %}">
+                    <div class="nav-link-icon"><i data-feather="clock"></i></div>
+                    Historial de ventas
+                </a>
+                <a class="nav-link" href="{% url 'inventario:cierre_caja_lista' %}">
+                    <div class="nav-link-icon"><i data-feather="lock"></i></div>
+                    Cierre de caja
+                </a>
+                <a class="nav-link" href="{% url 'inventario:configuracion_ticket' %}">
+                    <div class="nav-link-icon"><i data-feather="file-text"></i></div>
+                    Configuración de ticket
+                </a>
+                <a class="nav-link" href="{% url 'inventario:entrada_inventario' %}">
+                    <div class="nav-link-icon"><i data-feather="arrow-down-circle"></i></div>
+                    Entrada de inventario
+                </a>
+                <a class="nav-link" href="{% url 'inventario:salida_inventario' %}">
+                    <div class="nav-link-icon"><i data-feather="arrow-up-circle"></i></div>
+                    Salida de inventario
+                </a>
+                <a class="nav-link" href="{% url 'inventario:historial_movimientos' %}">
+                    <div class="nav-link-icon"><i data-feather="file-text"></i></div>
+                    Historial de movimientos
+                </a>
+                <a class="nav-link" href="{% url 'inventario:kardex_producto' %}">
+                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
+                    Kardex de producto
+                </a>
+                
+                <!-- Barra lateral TABLA INVENTARIO -->
+                <div class="sidenav-menu-heading">Inventario</div>
+                <a class="nav-link" href="{% url 'inventario:producto' %}">
+                    <div class="nav-link-icon"><i data-feather="box"></i></div>
+                    Productos
+                </a>
+                <a class="nav-link" href="{% url 'inventario:categoriaLista' %}">
+                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
+                    Categorías
+                </a>
+                <a class="nav-link" href="{% url 'inventario:proveedorEmpresaLista' %}">
+                    <div class="nav-link-icon"><i data-feather="truck"></i></div>
+                    Proveedores
+                </a>
+                <a class="nav-link" href="{% url 'inventario:contactoProveedorLista' %}">
+                    <div class="nav-link-icon"><i data-feather="phone"></i></div>
+                    Contacto proveedor
+                </a>
+                <a class="nav-link" href="{% url 'inventario:marcaProductoLista' %}">
+                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
+                    Marcas de productos
+                </a>
+                
 
                 <!--
                 <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"

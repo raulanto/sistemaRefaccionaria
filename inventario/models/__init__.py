@@ -9,3 +9,4 @@ from .venta_modelo import Venta
 from .detalleVenta_modelo import DetalleVenta
 from .configuracionTicket_modelo import ConfiguracionTicket
 from .cierreCaja_modelo import CierreCaja
+from .movimientoInventario_modelo import MovimientoInventario

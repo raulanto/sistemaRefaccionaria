@@ -1,0 +1,1 @@
+from inventario.models import ContactoProveedor

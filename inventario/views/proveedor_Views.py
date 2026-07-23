@@ -1,9 +1,6 @@
-
-
 from django.http import JsonResponse
 from django.views import View
-
-from inventario.form.proveedorForm import ProveedorForm
+from inventario.forms.proveedorForm import ProveedorForm
 from inventario.models.provedorEmpresa_modelo import ProveedorEmpresa
 from django.views.generic.edit import CreateView, UpdateView
 from django.shortcuts import render, get_object_or_404, redirect

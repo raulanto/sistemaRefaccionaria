@@ -1,0 +1,43 @@
+<!-- ============================================================
+     BUSCADOR DE PRODUCTOS REUTILIZABLE
+     Incluir en cualquier template con:
+     Y en el JS de esa página, llamar:
+         BuscadorProducto.abrir(function(producto) {
+             // producto = { id, codigo, nombre, precio, stock, tiene_iva }
+         });
+     ============================================================ -->
+<div class="modal fade" id="modalBuscarProductoGlobal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-fullscreen-sm-down modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-search"></i> Buscar producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="inputBuscarProductoGlobal" class="form-control form-control-lg mb-3"
+               placeholder="Escribe código o nombre..." autocomplete="off">
+
+        <div id="resultadosBusquedaGlobal" class="list-group" style="max-height: 55vh; overflow-y: auto;"></div>
+
+        <div id="sinResultadosBusquedaGlobal" class="text-center text-muted py-4" style="display:none;">
+          <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+          No se encontraron productos
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between d-none d-md-flex">
+        <span class="text-muted small">
+          <i class="fas fa-arrows-alt-v"></i> Navega &nbsp;
+          <kbd>Enter</kbd> Seleccionar &nbsp;
+          <kbd>Esc</kbd> Cerrar
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .resultado-item-global { padding: 14px 16px; }
+  .resultado-item-global.activo { background: var(--bs-primary, #2c5aa0) !important; color: #fff !important; }
+  .resultado-item-global.activo .text-muted { color: #dbe4ff !important; }
+  .resultado-item-global.agotado { opacity: .5; pointer-events: none; }
+</style>

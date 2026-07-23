@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-f@1^36)nh6-*5)fas0ws7n(0$p!$yy4$hqf6dj1f1jvx$ube4g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.ngrok-free.dev', '.ngrok-free.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -154,3 +154,8 @@ WEBPACK_LOADER = {
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.dev',
+    'https://*.ngrok-free.app',
+]

@@ -1,0 +1,144 @@
+{% extends 'base/body.html' %}
+{% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card shadow">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span><i class="fas fa-list text-primary"></i> Historial de Movimientos</span>
+      <div class="d-flex gap-2">
+        <a href="{% url 'inventario:entrada_inventario' %}" class="btn btn-success btn-sm">
+          <i class="fas fa-arrow-down"></i> Entrada
+        </a>
+        <a href="{% url 'inventario:salida_inventario' %}" class="btn btn-danger btn-sm">
+          <i class="fas fa-arrow-up"></i> Salida
+        </a>
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- BOTONES RÁPIDOS -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtroRapido('hoy')">Hoy</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtroRapido('semana')">Esta semana</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtroRapido('mes')">Este mes</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtroRapido('mes_pasado')">Mes pasado</button>
+      </div>
+
+      <!-- FILTROS -->
+      <form method="GET" class="row g-2 mb-4">
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted mb-1">Desde</label>
+          <input type="date" name="fecha_inicio" id="fechaInicio" class="form-control form-control-sm" value="{{ fecha_inicio|default:'' }}">
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted mb-1">Hasta</label>
+          <input type="date" name="fecha_fin" id="fechaFin" class="form-control form-control-sm" value="{{ fecha_fin|default:'' }}">
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted mb-1">Tipo</label>
+          <select name="tipo" class="form-select form-select-sm">
+            <option value="" {% if not tipo %}selected{% endif %}>Todos</option>
+            <option value="ENTRADA" {% if tipo == 'ENTRADA' %}selected{% endif %}>Solo entradas</option>
+            <option value="SALIDA" {% if tipo == 'SALIDA' %}selected{% endif %}>Solo salidas</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3 d-flex align-items-end gap-2">
+          <button type="submit" class="btn btn-primary btn-sm w-100">
+            <i class="fas fa-search"></i> Filtrar
+          </button>
+        </div>
+      </form>
+
+      <div class="d-flex justify-content-end mb-3">
+        <a href="#" id="linkDescargarPdf" class="btn btn-outline-danger btn-sm">
+          <i class="fas fa-file-pdf"></i> Descargar PDF
+        </a>
+      </div>
+
+      <!-- TABLA -->
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+          <thead class="table-light text-center small text-uppercase text-muted">
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Producto</th>
+              <th>Motivo</th>
+              <th>Cantidad</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in movimientos %}
+            <tr>
+              <td class="small">{{ m.fecha|date:"d/m/Y H:i" }}</td>
+              <td class="text-center">
+                {% if m.tipo == 'ENTRADA' %}
+                  <span class="badge bg-success">Entrada</span>
+                {% else %}
+                  <span class="badge bg-danger">Salida</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ m.producto.codigo }}</span>
+                {{ m.producto.nombre }}
+              </td>
+              <td class="small">{{ m.get_motivo_display }}</td>
+              <td class="text-center fw-bold">{{ m.cantidad }}</td>
+              <td class="small text-muted">{{ m.usuario|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">No hay movimientos en este rango.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  // Ajusta el link de "Descargar PDF" para que lleve los mismos filtros que ves en pantalla
+  function actualizarLinkPdf() {
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('linkDescargarPdf').href = "{% url 'inventario:historial_movimientos_pdf' %}?" + params.toString();
+  }
+  actualizarLinkPdf();
+
+  function formatoFecha(d) {
+    return d.toISOString().split('T')[0]; // YYYY-MM-DD
+  }
+
+  function filtroRapido(opcion) {
+    const hoy = new Date();
+    let desde, hasta;
+
+    if (opcion === 'hoy') {
+      desde = hasta = hoy;
+    } else if (opcion === 'semana') {
+      const diaSemana = hoy.getDay() === 0 ? 6 : hoy.getDay() - 1; // lunes = inicio de semana
+      desde = new Date(hoy);
+      desde.setDate(hoy.getDate() - diaSemana);
+      hasta = hoy;
+    } else if (opcion === 'mes') {
+      desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      hasta = hoy;
+    } else if (opcion === 'mes_pasado') {
+      desde = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+      hasta = new Date(hoy.getFullYear(), hoy.getMonth(), 0); // día 0 = último día del mes anterior
+    }
+
+    document.getElementById('fechaInicio').value = formatoFecha(desde);
+    document.getElementById('fechaFin').value = formatoFecha(hasta);
+    document.querySelector('form').submit();
+  }
+</script>
+{% endblock %}

@@ -13,8 +13,7 @@ from inventario.models.venta_modelo import Venta
 
 class DashboardView(View):
     def get(self, request):
-        hoy = timezone.now().date()
-
+        hoy = timezone.localdate()
         # Ventas de hoy
         ventas_hoy = Venta.objects.filter(fecha__date=hoy, estado="activa")
         total_ventas_hoy = ventas_hoy.aggregate(total=Sum("total"))["total"] or 0

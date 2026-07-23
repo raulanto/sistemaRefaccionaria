@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #222; }
+    h1 { font-size: 18px; margin-bottom: 2px; }
+    .subtitulo { color: #666; margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 5px 6px; text-align: left; }
+    th { background: #f0f0f0; }
+    .center { text-align: center; }
+    .entrada { color: #1f9d55; font-weight: bold; }
+    .salida { color: #d64545; font-weight: bold; }
+    .footer { margin-top: 20px; color: #888; font-size: 9px; }
+</style>
+</head>
+<body>
+
+    <h1>Historial de Movimientos de Inventario</h1>
+    <div class="subtitulo">
+        {% if fecha_inicio or fecha_fin %}
+            Periodo: {{ fecha_inicio|default:"inicio" }} — {{ fecha_fin|default:"hoy" }}
+        {% else %}
+            Todos los movimientos registrados
+        {% endif %}
+        {% if tipo %} · Solo {{ tipo|lower }}s{% endif %}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Producto</th>
+                <th>Motivo</th>
+                <th class="center">Cantidad</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in movimientos %}
+            <tr>
+                <td>{{ m.fecha|date:"d/m/Y H:i" }}</td>
+                <td class="{% if m.tipo == 'ENTRADA' %}entrada{% else %}salida{% endif %}">{{ m.tipo }}</td>
+                <td>{{ m.producto.codigo }} — {{ m.producto.nombre }}</td>
+                <td>{{ m.get_motivo_display }}</td>
+                <td class="center">{{ m.cantidad }}</td>
+                <td>{{ m.usuario|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="center">No hay movimientos en este rango.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Generado el {{ fecha_generacion|date:"d/m/Y H:i" }}
+    </div>
+
+</body>
+</html>

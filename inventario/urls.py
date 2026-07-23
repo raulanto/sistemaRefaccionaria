@@ -1,9 +1,10 @@
 from django.urls import path
-from inventario.views import cierreCajaViews
-from .views import productoViews, ProveedorListaView, CategoriaListaView, MostrarProductos, ProveedorDetalleView, crearProducto, ReportesView
-from .views import productoViews, ProveedorListaView, CategoriaListaView, MostrarProductos, ProveedorDetalleView, crearProducto, DashboardView
+from inventario.views import cierreCaja_Views, inventarioMovimientos_Views
+from .views import ProveedorListaView, CategoriaListaView, MostrarProductos, ProveedorDetalleView, crearProducto, producto_Views
+from .views import ProveedorListaView, CategoriaListaView, MostrarProductos, ProveedorDetalleView, crearProducto, DashboardView
 from . import views
-from .views.proveedorViews import ProveedorCrearView, ProveedorEditarView
+from .views.proveedor_Views import ProveedorCrearView, ProveedorEditarView
+from .views import kardex_Views
 
 
 app_name = 'inventario'
@@ -12,12 +13,13 @@ urlpatterns = [
     path('', DashboardView.as_view(), name='index'), 
     
     #PRODUCTO
-    path('producto/', productoViews.ProductoView.as_view(), name='producto'),
+    path('producto/', producto_Views.ProductoView.as_view(), name='producto'),
     path ('crear_producto/', crearProducto.as_view(), name='crear_producto'),
     path('eliminar_producto/<int:pk>/',views.eliminar_producto_ajax,name='eliminar_producto_ajax'),
     path('producto/editar/<int:pk>/', views.ProductoUpdateView.as_view(), name='editar_producto'),
     path('producto/<int:id_producto>/', MostrarProductos, name='mostrar_productos'),
-    path('productos/exportar/', productoViews.ExportarProdutosExcel, name='exportarProductosExcel'),
+    path('productos/exportar/', producto_Views.ExportarProdutosExcel, name='exportarProductosExcel'),
+    path('productos/buscar_ajax/', views.buscar_productos_ajax, name='buscar_productos_ajax'),
 
     
     #PROVEEDOR EMPRESA
@@ -42,7 +44,9 @@ urlpatterns = [
     path('categoriaProducto/categoria_editar/<int:pk>/', views.CategoriaEditarView.as_view(), name='categoriaEditar'),
     path('categoriaProducto/<int:pk>/', views.EliminarCategoriaAjax, name='eliminarCategoriaAjax'),
     
-      
+    #MARCA PRODUCTO
+    path('marcaProducto/marca_lista/', views.MarcaProductoView.as_view(), name='marcaProductoLista'),
+    
     #VENTA
     path('venta/', views.VentaView, name='venta'),
     path("guardar_venta/", views.guardar_venta, name="guardar_venta"),
@@ -50,6 +54,8 @@ urlpatterns = [
     path('venta/<int:id>/', views.detalle_venta_nota, name='detalle_venta_nota'),
     path("venta/<int:id>/ticket/",views.imprimir_ticket,name="imprimir_ticket",),
     path("cancelar_venta/<int:id>/", views.cancelar_venta, name="cancelar_venta"),
+    path('ventas_views/', views.buscar_productos_ajax, name='buscar_productos_ajax'),
+
     
     #CONFIGURACION TICKET
     path("configuracion_ticket/", views.configuracion_ticket, name="configuracion_ticket"),
@@ -57,10 +63,20 @@ urlpatterns = [
     #DASHBOARD
     path('dashboard/dashboard',views.DashboardView.as_view(),name='dashboard'),
     
+    #Movimientos de inventario
+    path('inventarioMovimiento/entrada/', inventarioMovimientos_Views.EntradaInventarioView.as_view(), name='entrada_inventario'), # type: ignore
+    path('inventarioMovimiento/salida/', inventarioMovimientos_Views.SalidaInventarioView.as_view(), name='salida_inventario'),
+    path('inventarioMovimiento/historial/', inventarioMovimientos_Views.MovimientosHistorialView.as_view(), name='historial_movimientos'),
+    path('inventarioMovimiento/historial/pdf/', views.historial_pdf, name='historial_movimientos_pdf'),
+    
+    #Kardex de producto
+    path('kardex/kardex/', kardex_Views.KardexProductoView.as_view(), name='kardex_producto'),
+    path('kardex/kardex_pdf/<int:producto_id>/pdf/', kardex_Views.kardex_pdf, name='kardex_producto_pdf'),
+    
     #CIERRE DE CAJA
-    path('cierre_caja/', cierreCajaViews.CierreCajaListView.as_view(), name='cierre_caja_lista'),
-    path('cierre_caja/cerrar/', cierreCajaViews.cerrar_caja, name='cerrar_caja'),
-    path('cierre_caja/<int:cierre_id>/ventas/', cierreCajaViews.ventas_de_cierre, name='ventas_de_cierre'),
-    path('venta/<int:venta_id>/detalle_ajax/', cierreCajaViews.detalle_venta_ajax, name='detalle_venta_ajax'),
+    path('cierre_caja/', cierreCaja_Views.CierreCajaListView.as_view(), name='cierre_caja_lista'),
+    path('cierre_caja/cerrar/', cierreCaja_Views.cerrar_caja, name='cerrar_caja'),
+    path('cierre_caja/<int:cierre_id>/ventas/', cierreCaja_Views.ventas_de_cierre, name='ventas_de_cierre'),
+    path('venta/<int:venta_id>/detalle_ajax/', cierreCaja_Views.detalle_venta_ajax, name='detalle_venta_ajax'),
     
 ]

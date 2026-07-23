@@ -8,6 +8,7 @@ from inventario.models import Venta, CierreCaja, DetalleVenta
 
 class CierreCajaListView(View):
     def get(self, request):
+
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_fin = request.GET.get('fecha_fin')
 
@@ -21,14 +22,16 @@ class CierreCajaListView(View):
         ventas_pendientes = Venta.objects.filter(cierre__isnull=True, estado='activa')
         total_pendiente = ventas_pendientes.aggregate(total=Sum('total'))['total'] or 0
 
-        context = {
+        data = {
+            "titulo": "Cierre de Caja",
+            "mensaje": "Bienvenido al sistema de cierre de caja.",
             'cierres': cierres,
             'ventas_pendientes': ventas_pendientes,
             'total_pendiente': total_pendiente,
             'fecha_inicio': fecha_inicio,
             'fecha_fin': fecha_fin,
         }
-        return render(request, 'cierreCaja/cierreCajalista.html', context)
+        return render(request, 'cierreCaja/cierreCajalista.html', data)
 
 
 def cerrar_caja(request):

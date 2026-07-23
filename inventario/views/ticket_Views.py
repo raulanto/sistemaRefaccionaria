@@ -3,7 +3,7 @@ import json
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.edit import CreateView, UpdateView
-from inventario.form.configuracionTicket import ConfiguracionTicketForm
+from inventario.forms.configuracionTicket import ConfiguracionTicketForm
 from inventario.models.catalogo.marca_producto import MarcaProducto
 from inventario.models.configuracionTicket_modelo import ConfiguracionTicket
 from inventario.models.detalleVenta_modelo import DetalleVenta
