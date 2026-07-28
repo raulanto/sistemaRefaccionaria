@@ -79,7 +79,6 @@ class DetalleClienteCreditoView(View):
         movimientos = CreditoService.historial_con_saldo(cliente)
         movimientos.reverse()  # más reciente arriba
         saldo_actual = CreditoService.calcular_saldo(cliente)
-        movimientos = [m for m in movimientos if not m['cancelado']]
 
         return render(request, 'credito/cliente_detalle.html', {
             'titulo': 'Detalle de Cliente',
@@ -126,6 +125,8 @@ def detalle_cliente_credito_pdf(request, cliente_id):
     cliente = get_object_or_404(ClienteCredito, id=cliente_id)
     movimientos = CreditoService.historial_con_saldo(cliente)  # orden cronológico
     saldo_actual = CreditoService.calcular_saldo(cliente)
+    movimientos = [m for m in movimientos if not m['cancelado']]
+    
  
     html = render_to_string('credito/cliente_detalle_pdf.html', {
         'cliente': cliente,
