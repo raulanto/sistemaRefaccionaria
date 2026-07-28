@@ -1,7 +1,9 @@
 from django.http import JsonResponse
+from django.urls import reverse_lazy
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from inventario.forms.producto_form import ProductoForm
+from inventario.models.movimientoInventario_modelo import MovimientoInventario
 from inventario.models.productoImagen_modelo import ProductoImagen
 from inventario.models.producto_modelo import Producto
 from django.views.generic.edit import CreateView, UpdateView
@@ -12,8 +14,10 @@ from django.http import HttpResponse
 from inventario.models import Producto
 from django.http import JsonResponse
 from django.db.models import Q
+from inventario.services.inventario_service import InventarioService
 
-class ProductoView(View):
+
+class ProductoListaView(View):
     def get(self, request):
         productos = Producto.objects.all()
         data = {
@@ -21,41 +25,58 @@ class ProductoView(View):
             "mensaje": "Bienvenido al sistema de inventario de refacciones.",
             "productos": productos,
         }
-        return render(request, "productos.html", context=data)
+        return render(request, "producto/producto_lista.html", context=data)
 
 
-def MostrarProductos(request, id_producto):
-    producto = get_object_or_404(Producto, id=id_producto)
-    imagenes = ProductoImagen.objects.filter(producto=producto).order_by("orden")
-    data = {
-        "titulo": "Detalle del Producto",
-        "producto": producto,
-        "imagenes": imagenes,
-    }
-    return render(request, "detalle/detalle_producto.html", context=data)
+class ProductoDetalleView(View):
+    def get(self, request, id_producto):
+        producto = get_object_or_404(Producto, id=id_producto)
+        imagenes = ProductoImagen.objects.filter(producto=producto).order_by("orden")
+        data = {
+            "titulo": "Detalle del Producto",
+            "producto": producto,
+            "imagenes": imagenes,
+        }
+        return render(request, "producto/producto_detalle.html", context=data)
 
 
-class crearProducto(CreateView):
+class ProductoCrearView(CreateView):
     model = Producto
     form_class = ProductoForm
-    template_name = "crud/crear_producto.html"
-    success_url = "/producto/"
+    template_name = "producto/producto_crear.html"
+    success_url = reverse_lazy("inventario:productoLista")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["titulo"] = "Crear Producto"
-        context["mensaje"] = "Completa el formulario para crear un nuevo producto"
-        return context
+    def form_valid(self, form):
+        response = super().form_valid(
+            form
+        )  # el producto ya se guardó con su stock inicial
+
+        stock_inicial = self.object.stock
+        if stock_inicial > 0:
+            # Solo registramos el movimiento para que quede en el Kardex,
+            # SIN volver a sumar al stock (ya está guardado desde el formulario)
+            MovimientoInventario.objects.create(
+                producto=self.object,
+                tipo="ENTRADA",
+                cantidad=stock_inicial,
+                motivo="AJUSTE",
+                observaciones="Stock inicial al dar de alta el producto",
+                usuario=(
+                    self.request.user if self.request.user.is_authenticated else None
+                ),
+            )
+
+        return response
 
 
-class ProductoUpdateView(UpdateView):
+class ProductoEditarView(UpdateView):
     model = Producto
     form_class = ProductoForm
-    template_name = "crud/crear_producto.html"
-    success_url = "/producto/"
+    template_name = "producto/producto_crear.html"
+    success_url = "/producto/producto_lista/"
 
 
-def eliminar_producto_ajax(request, pk):
+def EliminarProductoAjax(request, pk):
     if request.method == "POST":
         producto = get_object_or_404(Producto, pk=pk)
         try:

@@ -30,6 +30,7 @@ pyHanko==0.35.2
 pyhanko-certvalidator==0.31.1
 pypdf==6.14.2
 python-bidi==0.6.11
+python-decouple==3.8
 python-dotenv==1.2.2
 pytokens==0.4.1
 PyYAML==6.0.3

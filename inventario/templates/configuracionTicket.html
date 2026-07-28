@@ -1,16 +1,133 @@
-
 {% extends 'base/body.html' %}
+
 {% block headercontect %}
     {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
+
 {% block content %}
-<form method="POST">
-    {% csrf_token %}
 
-    {{ form.as_p }}
+<div class="container-fluid mt-n10">
+  <div class="row g-3">
 
-    <button type="submit">
-        Guardar
-    </button>
-</form>
-{% endblock %} 
+    <!-- FORMULARIO -->
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0">
+            <i class="fas fa-cog text-primary"></i>
+            Configuración del Ticket
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <form method="POST" id="formTicket">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre de la empresa</label>
+              {{ form.nombre_empresa }}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Teléfono</label>
+                {{ form.telefono }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Correo electrónico</label>
+                {{ form.correo }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Dirección</label>
+              {{ form.direccion }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mensaje Final</label>
+              {{ form.mensaje_final }}
+            </div>
+
+            <div class="border-top pt-3 d-flex justify-content-end gap-2">
+              <a href="{% url 'inventario:dashboard' %}" class="btn btn-outline-secondary">
+                Cancelar
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Guardar
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA PREVIA DEL TICKET -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0">
+            <i class="fas fa-receipt text-secondary"></i>
+            Vista previa
+          </h5>
+        </div>
+        <div class="card-body d-flex justify-content-center bg-light">
+          <div id="previewTicket" class="bg-white p-3 shadow-sm" style="width: 280px; font-family: 'Courier New', monospace; font-size: .85rem;">
+            <div class="text-center fw-bold" id="previewNombre">Nombre de la empresa</div>
+            <div class="text-center small" id="previewDireccion">Dirección</div>
+            <div class="text-center small" id="previewTelefono">Teléfono</div>
+            <div class="text-center small mb-2" id="previewCorreo">Correo electrónico</div>
+            <div class="border-top border-dark my-2"></div>
+            <div class="d-flex justify-content-between small">
+              <span>Producto</span>
+              <span>Importe</span>
+            </div>
+            <div class="d-flex justify-content-between small text-muted">
+              <span>Ejemplo x1</span>
+              <span>$00.00</span>
+            </div>
+            <div class="border-top border-dark my-2"></div>
+            <div class="d-flex justify-content-between fw-bold">
+              <span>Total</span>
+              <span>$00.00</span>
+            </div>
+            <div class="border-top border-dark my-2"></div>
+            <div class="text-center small fst-italic" id="previewMensaje">Mensaje final</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  function actualizarPreview() {
+    const nombre = document.getElementById('{{ form.nombre_empresa.id_for_label }}').value;
+    const telefono = document.getElementById('{{ form.telefono.id_for_label }}').value;
+    const correo = document.getElementById('{{ form.correo.id_for_label }}').value;
+    const direccion = document.getElementById('{{ form.direccion.id_for_label }}').value;
+    const mensaje = document.getElementById('{{ form.mensaje_final.id_for_label }}').value;
+
+    document.getElementById('previewNombre').innerText = nombre || 'Nombre de la empresa';
+    document.getElementById('previewDireccion').innerText = direccion || 'Dirección';
+    document.getElementById('previewTelefono').innerText = telefono ? 'Tel: ' + telefono : 'Teléfono';
+    document.getElementById('previewCorreo').innerText = correo || 'Correo electrónico';
+    document.getElementById('previewMensaje').innerText = mensaje || 'Mensaje final';
+  }
+
+  ['{{ form.nombre_empresa.id_for_label }}', '{{ form.telefono.id_for_label }}',
+   '{{ form.correo.id_for_label }}', '{{ form.direccion.id_for_label }}',
+   '{{ form.mensaje_final.id_for_label }}'].forEach((id) => {
+    const campo = document.getElementById(id);
+    if (campo) campo.addEventListener('input', actualizarPreview);
+  });
+
+  document.addEventListener('DOMContentLoaded', actualizarPreview);
+</script>
+{% endblock %}

@@ -1,11 +1,10 @@
 from django import forms
-from inventario.models import marca_producto
+from inventario.models.catalogo.marca_producto import MarcaProducto
 
 class MarcaProductoForm(forms.ModelForm):
     class Meta:
-        model = marca_producto
-        fields = ['nombre', 'descripcion']
+        model = MarcaProducto
+        fields = ['nombre']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
         }

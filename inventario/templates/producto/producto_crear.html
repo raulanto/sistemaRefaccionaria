@@ -1,0 +1,270 @@
+{% extends 'base/body.html' %} {% block headercontect %}
+{% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid mt-n10">
+
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-box"></i>
+                Nuevo Producto
+            </h4>
+            <a href="{% url 'inventario:productoLista' %}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="form-compacto">
+                {% csrf_token %}
+                <!-- ========================= -->
+                <!-- INFORMACIÓN GENERAL -->
+                <!-- ========================= -->
+
+                <h5 class="text-red mb-3">
+                    Información General
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Código</label>
+                        {{ form.codigo }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Código de Barras</label>
+                        {{ form.codigo_barras }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Estado</label>
+                        {{ form.estado }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label>Nombre del Producto</label>
+                        {{ form.nombre }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label>Descripción</label>
+                        {{ form.descripcion }}
+                    </div>
+                </div>
+                <hr>
+
+                <!-- ========================= -->
+                <!-- PRECIOS -->
+                <!-- ========================= -->
+
+                <h5 class="text-red mb-3">
+                    Precios
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Costo</label>
+                        <input type="number" step="0.01" id="inputCosto" name="precio_compra" class="form-control"
+                            value="{{ form.precio_compra.value|default:'0' }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>% Utilidad</label>
+                        <input type="number" step="0.01" id="inputMargen" class="form-control" value="30">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>¿Lleva IVA?</label>
+                        <select id="selectTieneIva" name="tiene_iva" class="form-control">
+                            <option value="True" {% if form.tiene_iva.value %}selected{% endif %}>Sí</option>
+                            <option value="False" {% if not form.tiene_iva.value %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Precio de Venta (sin IVA)</label>
+                        <input type="number" step="0.01" id="inputPrecioVenta" name="precio_venta" class="form-control"
+                            value="{{ form.precio_venta.value|default:'0' }}" readonly>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Precio Final (con IVA)</label>
+                        <input type="number" step="0.01" id="inputPrecioConIva" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Utilidad Real</label>
+                        <input type="text" id="labelMargenReal" class="form-control" value="30%" readonly>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Precio Mayoreo</label>
+                        {{ form.precio_mayoreo }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Cantidad Mayoreo</label>
+                        {{ form.cantidad_mayoreo }}
+                    </div>
+                </div>
+                <hr>
+
+
+                <!-- ========================= -->
+                <!-- INVENTARIO -->
+                <!-- ========================= -->
+
+                <h5 class="text-red mb-3">
+                    Inventario
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Stock Actual</label>
+                        {{ form.stock }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Stock Mínimo</label>
+                        {{ form.stock_minimo }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Unidad de Medida</label>
+                        {{ form.unidad_medida }}
+                    </div>
+                </div>
+                <hr>
+
+                <!-- ========================= -->
+                <!-- CLASIFICACIÓN -->
+                <!-- ========================= -->
+
+                <h5 class="text-red mb-3">
+                    Clasificación
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Categoría</label>
+                        <input type="text" list="listaCategorias" class="form-control" autocomplete="off"
+                            placeholder="Escribe para buscar..."
+                            value="{% if form.instance.categoria %}{{ form.instance.categoria.nombre }}{% endif %}"
+                            onchange="buscarYSeleccionar(this, 'id_categoria', categorias)">
+                        <datalist id="listaCategorias">
+                            {% for c in form.fields.categoria.queryset %}<option value="{{ c.nombre }}">{% endfor %}
+                        </datalist>
+                        <select id="id_categoria" name="categoria" style="display:none;">
+                            <option value="">---------</option>
+                            {% for c in form.fields.categoria.queryset %}
+                            <option value="{{ c.id }}" {% if form.instance.categoria_id == c.id %}selected{% endif %}>{{
+                                c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Marca</label>
+                        <input type="text" list="listaMarcas" class="form-control" autocomplete="off"
+                            placeholder="Escribe para buscar..."
+                            value="{% if form.instance.marca %}{{ form.instance.marca.nombre }}{% endif %}"
+                            onchange="buscarYSeleccionar(this, 'id_marca', marcas)">
+                        <datalist id="listaMarcas">
+                            {% for m in form.fields.marca.queryset %}<option value="{{ m.nombre }}">{% endfor %}
+                        </datalist>
+                        <select id="id_marca" name="marca" style="display:none;">
+                            <option value="">---------</option>
+                            {% for m in form.fields.marca.queryset %}
+                            <option value="{{ m.id }}" {% if form.instance.marca_id == m.id %}selected{% endif %}>{{
+                                m.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- ========================= -->
+                <!-- PROVEEDOR -->
+                <!-- ========================= -->
+
+                <h5 class="text-red mb-3">
+                    Proveedor
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-black">Proveedor Principal</label>
+                        {{ form.proveedor_principal }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Contacto del Proveedor</label>
+                        {{ form.contacto_proveedor }}
+                    </div>
+                </div>
+                <hr>
+                <!-- BOTONES -->
+                <div class="text-end">
+                    <button type="reset" class="btn btn-warning">
+                        <i class="fas fa-eraser"></i>
+                        Limpiar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i>
+                        Guardar Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Formulario compacto: reduce el tamaño de TODOS los campos dentro de .form-compacto,
+       sin importar si vienen de Django ({{ form.campo }}) o se escribieron a mano. */
+    .form-compacto label {
+        font-size: .85rem;
+        margin-bottom: .25rem;
+        font-weight: 500;
+        color: black;
+    }
+
+    .form-compacto .form-control,
+    .form-compacto .form-select {
+        padding: .25rem .5rem;
+        font-size: .875rem;
+        min-height: calc(1.5em + .5rem + 2px);
+    }
+
+    .form-compacto textarea.form-control {
+        min-height: auto;
+    }
+
+    .form-compacto .row {
+        margin-bottom: -.5rem;
+    }
+
+    .form-compacto .row>div {
+        margin-bottom: .75rem;
+    }
+
+    .form-compacto h5 {
+        font-size: 1rem;
+        margin-bottom: .75rem !important;
+    }
+
+    .form-compacto hr {
+        margin: .75rem 0;
+    }
+</style>
+
+{% endblock %}
+{% load static %}
+{% block script %}
+<script src="{% static 'js/calculadora-precios.js' %}"></script>
+<script>
+    const categorias = [
+        {% for c in form.fields.categoria.queryset %}{ id: {{ c.id }}, nombre: "{{ c.nombre|escapejs }}" },{% endfor %}
+    ];
+    const marcas = [
+        {% for m in form.fields.marca.queryset %}{ id: {{ m.id }}, nombre: "{{ m.nombre|escapejs }}" },{% endfor %}
+    ];
+
+    function buscarYSeleccionar(input, selectId, lista) {
+        const encontrado = lista.find(item => item.nombre === input.value.trim());
+        document.getElementById(selectId).value = encontrado ? encontrado.id : '';
+        input.classList.toggle('is-invalid', !encontrado);
+    }
+</script>
+{% endblock %}

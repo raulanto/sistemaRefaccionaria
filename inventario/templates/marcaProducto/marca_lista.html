@@ -5,8 +5,9 @@
 {% block content %}
 <div class="container-fluid mt-n10">
   <div class="card card-header-actions">
-    <div class="card-header">Lista de Categorias
-         <a class="btn btn-primary btn-sn" href="">Nueva Categoria</a>
+    <div class="card-header">Lista de Marcas
+         <a class="btn btn-primary btn-sn" href=" {% url 'inventario:marcaProductoCrear' %}">Nueva Marca</a>
+         </a>
     </div>
     <div class="card-body">
       <table class="table table-bordered table-hover" id="dataTable">
@@ -27,7 +28,9 @@
           <tr id="fila-{{ marca.id }}" >
             <td>{{ marca.nombre }}</td>
             <td>
-              <a class="btn btn-success btn-sm" href="">Detalle</a>
+              <a class="btn btn-success btn-sm" href="{% url 'inventario:marcaProductoDetalle' marca.id %}">Detalle</a>
+              <a class="btn btn-primary btn-sm" href="{% url 'inventario:marcaProductoEditar' marca.id %}">Editar</a>
+                <button onclick="alertaEliminar('{{marca.id}}')" class="btn btn-danger btn-sm">Eliminar</button>
             </td>
           </tr>
           {% endfor %}
@@ -59,7 +62,7 @@
       confirmButtonText: "Sí, borrar",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch("/categoriaProducto/" + id + "/", {
+        fetch("/eliminarMarca/" + id + "/", {
           method: "POST",
           headers: {
             "X-CSRFToken": "{{ csrf_token }}",

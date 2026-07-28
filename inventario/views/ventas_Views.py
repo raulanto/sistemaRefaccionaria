@@ -15,7 +15,6 @@ from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
 
 
-
 def VentaView(request):
     productos = Producto.objects.all()
     data = {
@@ -27,101 +26,89 @@ def VentaView(request):
 
 
 def guardar_venta(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            carrito = data.get("carrito", [])
-            total = data.get("total", 0)
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "Método no permitido"})
 
-            # 1. Aseguramos crear la venta convirtiendo el total a float/decimal
-            venta = Venta.objects.create(total=float(total))
+    try:
+        data = json.loads(request.body)
+        carrito = data.get("carrito", [])
+        total = data.get("total")
+        es_credito = data.get("es_credito", False)
+        cliente_credito_id = data.get("cliente_credito_id")
 
-            # 2. Barremos los artículos
-            for item in carrito:
-                # Forzamos que el ID se maneje como un entero por si llega como string
-                producto_id = int(item["id"])
-                producto = get_object_or_404(Producto, id=producto_id)
+        if not carrito:
+            return JsonResponse({"ok": False, "error": "El carrito está vacío."})
 
-                cantidad = int(item["cantidad"])
-                # Forzamos que el precio sea un flotante/decimal puro
-                precio_unitario = float(item["precio"])
-
-                if producto.stock < cantidad:
-                    return JsonResponse(
-                        {
-                            "ok": False,
-                            "error": f"Stock insuficiente para {producto.nombre}",
-                        },
-                        status=400,
-                    )
-
-                # 3. Guardamos el detalle con tipos de datos limpios
-                DetalleVenta.objects.create(
-                    venta=venta,
-                    producto=producto,
-                    cantidad=cantidad,
-                    precio=precio_unitario,
-                    subtotal=cantidad * precio_unitario,
-                )
-
-                # 4. Descontamos stock
-                producto.stock -= cantidad
-                producto.save()
-
-            return JsonResponse({"ok": True, "venta_id": venta.id})
-
-        except Exception as e:
-            # Si algo falla, esto te dirá EXACTAMENTE qué línea o variable rompió el código
+        if es_credito and not cliente_credito_id:
             return JsonResponse(
-                {"ok": False, "error": f"Error en backend: {str(e)}"}, status=400
+                {"ok": False, "error": "Selecciona un cliente de crédito."}
             )
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            carrito = data["carrito"]
-            total = data["total"]
 
-            # 1. Creamos la cabecera de la venta
-            venta = Venta.objects.create(total=total)
-
-            # 2. Iteramos sobre los artículos enviados desde el Javascript
+        with transaction.atomic():
+            # Descuenta stock — igual para venta de contado o a crédito
             for item in carrito:
-                # 🟢 Buscamos el objeto Producto real usando su ID enviado por el frontend
-                # (Asegúrate de que tu Javascript mande el 'id' del producto)
-                producto = get_object_or_404(Producto, id=item["id"])
-
-                # Opcional: Validar stock antes de vender
-                if producto.stock < int(item["cantidad"]):
-                    return JsonResponse(
-                        {
-                            "ok": False,
-                            "error": f"Stock insuficiente para {producto.nombre}",
-                        },
-                        status=400,
-                    )
-
-                # 🟢 Creamos el registro del renglón usando la instancia del producto
-                DetalleVenta.objects.create(
-                    venta=venta,
-                    producto=producto,  # <-- Ahora sí le pasamos el objeto Producto real
-                    cantidad=item["cantidad"],
-                    precio=item["precio"],
-                    subtotal=float(item["cantidad"]) * float(item["precio"]),
-                )
-
-                # 🟢 Descontamos las refacciones vendidas de tu inventario
-                producto.stock -= int(item["cantidad"])
+                producto = Producto.objects.select_for_update().get(id=item["id"])
+                if producto.stock < item["cantidad"]:
+                    raise ValueError(f"Stock insuficiente para {producto.nombre}.")
+                producto.stock -= item["cantidad"]
                 producto.save()
 
-            return JsonResponse({"ok": True, "venta_id": venta.id})
+            if es_credito:
+                # Registra el CARGO en la cuenta del cliente
+                nombres = ", ".join(
+                    [f"{item['cantidad']}x {item['nombre']}" for item in carrito]
+                )
+                concepto = f"Venta a crédito: {nombres}"
 
-        except Exception as e:
-            return JsonResponse({"ok": False, "error": str(e)}, status=400)
+                # 👇 Esto es lo nuevo: armamos una lista con los productos vendidos
+                # para poder regresarlos al stock si algún día se cancela este cargo
+                productos_detalle = [
+                    {
+                        "producto_id": item["id"],
+                        "cantidad": item["cantidad"],
+                        "precio": item["precio"],
+                    }
+                    for item in carrito
+                ]
+
+                CreditoService.registrar_cargo(
+                    cliente_id=cliente_credito_id,
+                    monto=total,
+                    concepto=concepto,
+                    usuario=request.user if request.user.is_authenticated else None,
+                    productos=productos_detalle,  # 👈 esto es lo único que se agregó a la llamada
+                )
+                return JsonResponse({"ok": True, "tipo": "credito"})
+            else:
+                # Flujo normal: crea la Venta y sus DetalleVenta
+                venta = Venta.objects.create(
+                    total=total,
+                    estado="activa",
+                    usuario=request.user if request.user.is_authenticated else None,
+                )
+                for item in carrito:
+                    DetalleVenta.objects.create(
+                        venta=venta,
+                        producto_id=item["id"],
+                        cantidad=item["cantidad"],
+                        precio=item["precio"],
+                        subtotal=item["subtotal"],
+                    )
+                return JsonResponse(
+                    {"ok": True, "venta_id": venta.id, "tipo": "contado"}
+                )
+
+    except ValueError as e:
+        return JsonResponse({"ok": False, "error": str(e)})
+    except Exception as e:
+        return JsonResponse({"ok": False, "error": str(e)})
+
 
 def ventas_historial(request):
     """Trae todas las ventas del punto de venta ordenadas desde la más reciente"""
     ventas = Venta.objects.all().order_by("-fecha")
     return render(request, "ventas_historial.html", {"ventas": ventas})
+
 
 def cancelar_venta(request, id):
 
@@ -164,35 +151,42 @@ def cancelar_venta(request, id):
         # 📤 Respondemos al frontend (JavaScript)
         return JsonResponse({"estado": "ok"})
 
+
 from django.http import JsonResponse
 from django.db.models import Q
 
 
 def buscar_productos_ajax(request):
-    """""
+    """ ""
     Busca productos por código o nombre para el modal de búsqueda del punto de venta.
     GET /productos/buscar_ajax/?q=balata
     """
-    q = request.GET.get('q', '').strip()
+    q = request.GET.get("q", "").strip()
 
     productos = Producto.objects.all()
 
     if q:
-        productos = productos.filter(
-            Q(codigo__icontains=q) | Q(nombre__icontains=q)
-        )
+        productos = productos.filter(Q(codigo__icontains=q) | Q(nombre__icontains=q))
 
-    productos = productos.order_by('nombre')[:20]
+    productos = productos.order_by("nombre")[:20]
 
     data = [
         {
-            'id': p.id,
-            'codigo': p.codigo,
-            'nombre': p.nombre,
-            'precio': float(p.precio_venta),
-            'stock': p.stock,
-            'tiene_iva': p.tiene_iva,
+            "id": p.id,
+            "codigo": p.codigo,
+            "nombre": p.nombre,
+            "precio": float(p.precio_venta),
+            "stock": p.stock,
+            "tiene_iva": p.tiene_iva,
         }
         for p in productos
     ]
-    return JsonResponse({'productos': data})
+    return JsonResponse({"productos": data})
+
+
+import json
+from django.http import JsonResponse
+from django.db import transaction
+
+from inventario.models import Producto, Venta, DetalleVenta
+from inventario.services.credito_service import CreditoService

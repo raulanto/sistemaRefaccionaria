@@ -10,3 +10,6 @@ from .detalleVenta_modelo import DetalleVenta
 from .configuracionTicket_modelo import ConfiguracionTicket
 from .cierreCaja_modelo import CierreCaja
 from .movimientoInventario_modelo import MovimientoInventario
+from .movimientoCredito_modelo import MovimientoCredito
+from .clienteCredito_modelo import ClienteCredito
+from .catalogo.marca_producto import MarcaProducto

@@ -47,18 +47,14 @@
 
               <!-- Botón -->
               <td class="text-center">
-                <a
-                  href="{% url 'inventario:detalle_venta_nota' v.id %}"
-                  class="btn btn-sm btn-outline-info"
-                >
+                <a href="{% url 'inventario:detalle_venta_nota' v.id %}" class="btn btn-sm btn-outline-info">
                   Ver detalle
                 </a>
-                <button
-                  class="btn btn-danger btn-sm"
-                  onclick="cancelarVenta('{{ v.id }}')"
-                >
+                {% if v.estado != "cancelada" %}
+                <button class="btn btn-danger btn-sm" onclick="cancelarVenta('{{ v.id }}')">
                   Cancelar
                 </button>
+                {% endif %}
               </td>
             </tr>
 

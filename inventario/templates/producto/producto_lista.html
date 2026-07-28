@@ -8,7 +8,7 @@
   <div class="card-header d-flex justify-content-between align-items-center">
     Lista de productos
     <div>
-      <a class="btn btn-primary btn-sm me-2" href="{% url 'inventario:crear_producto' %}">
+      <a class="btn btn-primary btn-sm me-2" href="{% url 'inventario:productoCrear' %}">
         Nuevo Producto
       </a>
       <a class="btn btn-success btn-sm" href="{% url 'inventario:exportarProductosExcel' %}">
@@ -71,8 +71,8 @@
                 </td>
               <td>{{ producto.categoria }}</td>
               <td class="text-nowrap">
-                <a class="btn btn-success btn-sm" href="{% url 'inventario:mostrar_productos' producto.id %}">Detalle</a>
-                <a class="btn btn-primary btn-sm" href="{% url 'inventario:editar_producto' producto.id %}">Editar</a>
+                <a class="btn btn-success btn-sm" href="{% url 'inventario:productoDetalle' producto.id %}">Detalle</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'inventario:editarProducto' producto.id %}">Editar</a>
                 <button onclick="alertaEliminar('{{producto.id}}')" class="btn btn-danger btn-sm">Eliminar</button>
               </td>
             </tr>
@@ -110,7 +110,7 @@
       confirmButtonText: "Sí, borrar",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch("/eliminar_producto/" + id + "/", {
+        fetch("/eliminarProducto/" + id + "/", {
           method: "POST",
           headers: {
             "X-CSRFToken": "{{ csrf_token }}",

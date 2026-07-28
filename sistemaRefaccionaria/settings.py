@@ -24,7 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f@1^36)nh6-*5)fas0ws7n(0$p!$yy4$hqf6dj1f1jvx$ube4g'
+from decouple import config
+
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -56,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'inventario.middleware.LoginRequeridoMiddleware',   # 👈 agrega esta línea al final
+
 ]
 
 ROOT_URLCONF = 'sistemaRefaccionaria.urls'
@@ -152,8 +158,10 @@ WEBPACK_LOADER = {
     }
 }
 
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'          # a dónde va después de iniciar sesión
+LOGOUT_REDIRECT_URL = '/login/'   # a dónde va después de cerrar sesión
+
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',

@@ -1,0 +1,193 @@
+{% extends 'base/body.html' %}
+{% block headercontect %}
+{% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid mt-n10">
+  <div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="fas fa-hand-holding-usd text-primary"></i> Clientes de Crédito</span>
+      <button type="button" class="btn btn-primary btn-sm" onclick="abrirModalCliente()">
+        <i class="fas fa-plus"></i> Nuevo cliente
+      </button>
+    </div>
+    <div class="card-body">
+
+      <div class="alert alert-light border d-flex justify-content-between align-items-center mb-3">
+        <span>Total que te deben (todos los clientes)</span>
+        <strong class="text-danger">${{ total_general }}</strong>
+      </div>
+
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" id="inputBuscarCliente" class="form-control"
+            placeholder="Buscar cliente por nombre o contacto..." autocomplete="off">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Cliente</th>
+              <th>Contacto</th>
+              <th class="text-end">Saldo (deuda)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in clientes_con_saldo %}
+            <tr id="fila-cliente-{{ item.cliente.id }}" data-nombre="{{ item.cliente.nombre|lower }}"
+              data-contacto="{{ item.cliente.contacto|lower }}">
+              <td>{{ item.cliente.nombre }}</td>
+              <td class="text-muted small">{{ item.cliente.contacto|default:"—" }} · {{ item.cliente.telefono|default:"" }}</td>
+              <td class="text-end fw-bold {% if item.saldo > 0 %}text-danger{% else %}text-success{% endif %}">
+                ${{ item.saldo }}
+              </td>
+              <td class="text-end">
+                <a href="{% url 'inventario:detalle_cliente_credito' item.cliente.id %}"
+                  class="btn btn-sm btn-outline-primary">
+                  Ver detalle
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">No hay clientes de crédito registrados.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div id="sinResultadosBusqueda" class="text-center text-muted py-4" style="display:none;">
+        <i class="fas fa-search"></i> No se encontró ningún cliente con ese nombre o contacto.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL PROPIO (no depende de Bootstrap JS) ================= -->
+<div id="overlayModalCliente" class="modal-overlay-propio" style="display:none;" onclick="cerrarModalCliente(event)">
+  <div class="modal-caja-propia" onclick="event.stopPropagation()">
+    <div class="modal-header-propio">
+      <h5 class="mb-0">Nuevo Cliente de Crédito</h5>
+      <button type="button" class="btn-cerrar-propio" onclick="cerrarModalCliente()">&times;</button>
+    </div>
+    <form method="POST" action="{% url 'inventario:clientes_credito_lista' %}">
+      {% csrf_token %}
+      <div class="modal-body-propio">
+        <div class="mb-3">
+          <label class="form-label">Nombre / Empresa</label>
+          <input type="text" name="nombre" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contacto</label>
+          <input type="text" name="contacto" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Teléfono</label>
+          <input type="text" name="telefono" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Notas</label>
+          <textarea name="notas" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer-propio">
+        <button type="button" class="btn btn-secondary" onclick="cerrarModalCliente()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .modal-overlay-propio {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-caja-propia {
+    background: #fff;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 480px;
+    margin: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+  }
+
+  .modal-header-propio {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .btn-cerrar-propio {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #666;
+    cursor: pointer;
+  }
+
+  .modal-body-propio {
+    padding: 20px;
+  }
+
+  .modal-footer-propio {
+    padding: 12px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+</style>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  function abrirModalCliente() {
+    document.getElementById('overlayModalCliente').style.display = 'flex';
+  }
+
+  function cerrarModalCliente(event) {
+    document.getElementById('overlayModalCliente').style.display = 'none';
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') cerrarModalCliente();
+  });
+
+  document.getElementById('inputBuscarCliente').addEventListener('keyup', function () {
+    const filtro = this.value.toLowerCase().trim();
+    const filas = document.querySelectorAll('[id^="fila-cliente-"]');
+    let visibles = 0;
+
+    filas.forEach((fila) => {
+      const nombre = fila.dataset.nombre || '';
+      const contacto = fila.dataset.contacto || '';
+      const coincide = nombre.includes(filtro) || contacto.includes(filtro);
+      fila.style.display = coincide ? '' : 'none';
+      if (coincide) visibles++;
+    });
+
+    document.getElementById('sinResultadosBusqueda').style.display = visibles === 0 ? '' : 'none';
+  });
+</script>
+{% endblock %}

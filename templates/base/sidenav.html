@@ -43,7 +43,7 @@
                 
                 <!-- Barra lateral TABLA INVENTARIO -->
                 <div class="sidenav-menu-heading">Inventario</div>
-                <a class="nav-link" href="{% url 'inventario:producto' %}">
+                <a class="nav-link" href="{% url 'inventario:productoLista' %}">
                     <div class="nav-link-icon"><i data-feather="box"></i></div>
                     Productos
                 </a>
@@ -62,6 +62,10 @@
                 <a class="nav-link" href="{% url 'inventario:marcaProductoLista' %}">
                     <div class="nav-link-icon"><i data-feather="tag"></i></div>
                     Marcas de productos
+                </a>
+                <a class="nav-link" href="{% url 'inventario:clientes_credito_lista' %}">
+                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
+                    Clientes de crédito
                 </a>
                 
 

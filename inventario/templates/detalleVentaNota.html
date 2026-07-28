@@ -154,6 +154,9 @@
   <hr />
   <p>Venta #{{ venta.id }}</p>
   <p>{{ venta.fecha|date:"d/m/Y H:i" }}</p>
+  <div class="text-center small">
+    Vendió: {{ venta.usuario.username|default:"—" }}
+  </div>
   <hr />
   <table>
     <thead>

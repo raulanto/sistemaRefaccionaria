@@ -1,12 +1,10 @@
 {% extends 'base/body.html' %}
 {% block headercontect %}
-{% include 'base/header/overlapHeader.html' %}
+    {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
 {% block content %}
-
 <div class="container-fluid mt-n10">
   <div class="card shadow-sm">
-
     <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
       <span><i class="fas fa-file-invoice text-primary"></i> Nota de Venta</span>
       <button type="button" class="btn btn-primary btn-sm" onclick="abrirBuscador()">
@@ -16,34 +14,61 @@
     </div>
 
     <div class="card-body">
+      <!-- ============ TIPO DE VENTA: CONTADO / CRÉDITO ============ -->
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label small text-muted mb-1">Tipo de venta</label>
+          <div class="btn-group w-100" role="group">
+            <button type="button" class="btn btn-outline-primary active" id="btnContado"
+              onclick="cambiarModoVenta('contado')">
+              <i class="fas fa-money-bill-wave"></i> Contado
+            </button>
+            <button type="button" class="btn btn-outline-danger" id="btnCredito" onclick="cambiarModoVenta('credito')">
+              <i class="fas fa-hand-holding-usd"></i> Crédito
+            </button>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-8" id="seccionClienteCredito" style="display: none">
+          <label class="form-label small text-muted mb-1">Cliente de crédito</label>
+          <div class="input-group">
+            <input type="text" id="inputClienteSeleccionado" class="form-control" readonly
+              placeholder="Toca aquí para buscar un cliente..." />
+            <button type="button" class="btn btn-outline-danger" onclick="abrirBuscadorCliente()">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- TABLA DE PARTIDAS -->
       <div class="table-responsive">
         <table class="table table-bordered table-sm align-middle mb-0" id="tablaPartidas">
           <thead class="table-light">
             <tr class="text-center small text-uppercase text-muted">
-              <th style="width:36px;">#</th>
-              <th style="width:90px;">Código</th>
+              <th style="width: 36px">#</th>
+              <th style="width: 90px">Código</th>
               <th>Descripción</th>
-              <th style="width:80px;">Cant.</th>
-              <th style="width:100px;">P. Unit.</th>
-              <th style="width:60px;">IVA</th>
-              <th style="width:110px;">Importe</th>
-              <th style="width:40px;"></th>
+              <th style="width: 80px">Cant.</th>
+              <th style="width: 100px">P. Unit.</th>
+              <th style="width: 60px">IVA</th>
+              <th style="width: 110px">Importe</th>
+              <th style="width: 40px"></th>
             </tr>
           </thead>
           <tbody id="cuerpoPartidas">
             <tr id="filaVacia">
               <td colspan="8" class="text-center text-muted py-4">
                 <i class="fas fa-search"></i>
-                Presiona <strong>F2</strong> o el botón "Buscar producto" para agregar artículos
+                Presiona <strong>F2</strong> o el botón "Buscar producto" para
+                agregar artículos
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <hr>
+      <hr />
 
       <!-- RESUMEN -->
       <div class="row justify-content-end">
@@ -60,7 +85,9 @@
               </tr>
               <tr class="fw-bold border-top">
                 <td class="h5">Total</td>
-                <td class="text-end h4 text-success">$<span id="total">0.00</span></td>
+                <td class="text-end h4 text-success">
+                  $<span id="total">0.00</span>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -72,32 +99,31 @@
         <button class="btn btn-outline-danger w-100 w-md-auto" onclick="limpiar()">
           <i class="fas fa-trash"></i> Limpiar
         </button>
-        <button class="btn btn-success btn-lg w-100 w-md-auto" onclick="cobrar()">
+        <button class="btn btn-success btn-lg w-100 w-md-auto" id="btnCobrar" onclick="cobrar()">
           <i class="fas fa-check-circle"></i> Cobrar
         </button>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ================= MODAL DE BÚSQUEDA (F2) ================= -->
+<!-- ================= MODAL DE BÚSQUEDA DE PRODUCTO (F2) ================= -->
 <div class="modal fade" id="modalBuscarProducto" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fas fa-search"></i> Buscar producto</h5>
+        <h5 class="modal-title">
+          <i class="fas fa-search"></i> Buscar producto
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <input type="text" id="inputBuscarProducto" class="form-control form-control-lg mb-3"
-               placeholder="Escribe código o nombre..." autocomplete="off">
+          placeholder="Escribe código o nombre..." autocomplete="off" />
 
-        <div id="resultadosBusqueda" class="list-group" style="max-height: 50vh; overflow-y: auto;">
-          <!-- resultados AJAX aquí -->
-        </div>
+        <div id="resultadosBusqueda" class="list-group" style="max-height: 50vh; overflow-y: auto"></div>
 
-        <div id="sinResultadosBusqueda" class="text-center text-muted py-4" style="display:none;">
+        <div id="sinResultadosBusqueda" class="text-center text-muted py-4" style="display: none">
           <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
           No se encontraron productos
         </div>
@@ -105,29 +131,73 @@
       <div class="modal-footer justify-content-between">
         <span class="text-muted small">
           <i class="fas fa-arrows-alt-v"></i> Navega &nbsp;
-          <kbd>Enter</kbd> Seleccionar &nbsp;
-          <kbd>Esc</kbd> Cerrar
+          <kbd>Enter</kbd> Seleccionar &nbsp; <kbd>Esc</kbd> Cerrar
         </span>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ================= MODAL DE BÚSQUEDA DE CLIENTE DE CRÉDITO ================= -->
+<div class="modal fade" id="modalBuscarCliente" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-user-tie"></i> Buscar cliente de crédito
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="inputBuscarCliente" class="form-control form-control-lg mb-3"
+          placeholder="Escribe el nombre del cliente..." autocomplete="off" />
+
+        <div id="resultadosCliente" class="list-group" style="max-height: 40vh; overflow-y: auto"></div>
+
+        <div id="sinResultadosCliente" class="text-center text-muted py-4" style="display: none">
+          No se encontraron clientes.
+          <br />
+          <a href="{% url 'inventario:clientes_credito_lista' %}" target="_blank" class="small">
+            Dar de alta un cliente nuevo
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
-  #tablaPartidas td { padding: 6px 8px; vertical-align: middle; }
-  .celda-importe, .celda-precio-valor { text-align: right; }
-  .celda-cantidad-input { width: 70px; text-align: center; }
+  #tablaPartidas td {
+    padding: 6px 8px;
+    vertical-align: middle;
+  }
+
+  .celda-importe,
+  .celda-precio-valor {
+    text-align: right;
+  }
+
+  .celda-cantidad-input {
+    width: 70px;
+    text-align: center;
+  }
+
   .resultado-item.activo {
     background: #4e73df !important;
     color: #fff !important;
   }
-  .resultado-item.activo .text-muted { color: #dbe4ff !important; }
-  .resultado-item.agotado { opacity: .5; pointer-events: none; }
+
+  .resultado-item.activo .text-muted {
+    color: #dbe4ff !important;
+  }
+
+  .resultado-item.agotado {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 </style>
 
-{% endblock %}
-
-{% block script %}
+{% endblock %} {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   const IVA_RATE = 0.16;
@@ -138,33 +208,138 @@
   let indiceActivo = -1;
   let debounceTimer = null;
 
-  const modalBuscar = new bootstrap.Modal(document.getElementById('modalBuscarProducto'));
-  const inputBuscar = document.getElementById('inputBuscarProducto');
+  const modalBuscar = new bootstrap.Modal(
+    document.getElementById("modalBuscarProducto"),
+  );
+  const inputBuscar = document.getElementById("inputBuscarProducto");
+
+  /* ============== TIPO DE VENTA: CONTADO / CRÉDITO ============== */
+  let modoVenta = "contado";
+  let clienteCreditoSeleccionado = null;
+
+  function cambiarModoVenta(modo) {
+    modoVenta = modo;
+    document
+      .getElementById("btnContado")
+      .classList.toggle("active", modo === "contado");
+    document
+      .getElementById("btnCredito")
+      .classList.toggle("active", modo === "credito");
+    document.getElementById("seccionClienteCredito").style.display =
+      modo === "credito" ? "" : "none";
+
+    const btnCobrar = document.getElementById("btnCobrar");
+    if (modo === "credito") {
+      btnCobrar.classList.remove("btn-success");
+      btnCobrar.classList.add("btn-danger");
+      btnCobrar.innerHTML =
+        '<i class="fas fa-hand-holding-usd"></i> Registrar venta a crédito';
+    } else {
+      btnCobrar.classList.remove("btn-danger");
+      btnCobrar.classList.add("btn-success");
+      btnCobrar.innerHTML = '<i class="fas fa-check-circle"></i> Cobrar';
+    }
+  }
+
+  /* ============== BUSCADOR DE CLIENTE DE CRÉDITO ============== */
+  const modalCliente = new bootstrap.Modal(
+    document.getElementById("modalBuscarCliente"),
+  );
+  const inputBuscarCliente = document.getElementById("inputBuscarCliente");
+  let clientesActuales = [];
+  let debounceClienteTimer = null;
+
+  function abrirBuscadorCliente() {
+    inputBuscarCliente.value = "";
+    document.getElementById("resultadosCliente").innerHTML = "";
+    document.getElementById("sinResultadosCliente").style.display = "none";
+    modalCliente.show();
+    buscarClientesAjax("");
+  }
+
+  document
+    .getElementById("modalBuscarCliente")
+    .addEventListener("shown.bs.modal", function () {
+      inputBuscarCliente.focus();
+    });
+
+  inputBuscarCliente.addEventListener("input", function () {
+    clearTimeout(debounceClienteTimer);
+    debounceClienteTimer = setTimeout(
+      () => buscarClientesAjax(this.value.trim()),
+      250,
+    );
+  });
+
+  function buscarClientesAjax(query) {
+    fetch(`/credito/clientes/buscar_ajax/?q=${encodeURIComponent(query)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        clientesActuales = data.clientes;
+        renderResultadosCliente();
+      });
+  }
+
+  function renderResultadosCliente() {
+    const contenedor = document.getElementById("resultadosCliente");
+    const sinResultados = document.getElementById("sinResultadosCliente");
+
+    if (clientesActuales.length === 0) {
+      contenedor.innerHTML = "";
+      sinResultados.style.display = "";
+      return;
+    }
+    sinResultados.style.display = "none";
+
+    contenedor.innerHTML = clientesActuales
+      .map(
+        (c, i) => `
+      <button type="button" class="list-group-item list-group-item-action" onclick="seleccionarCliente(${i})">
+        <strong>${c.nombre}</strong>
+        ${c.contacto ? `<div class="small text-muted">${c.contacto}</div>` : ""}
+      </button>
+    `,
+      )
+      .join("");
+  }
+
+  function seleccionarCliente(index) {
+    const cliente = clientesActuales[index];
+    if (!cliente) return;
+    clienteCreditoSeleccionado = cliente;
+    document.getElementById("inputClienteSeleccionado").value = cliente.nombre;
+    modalCliente.hide();
+  }
 
   /* ============== ATAJO DE TECLADO F2 ============== */
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'F2') {
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "F2") {
       e.preventDefault();
       abrirBuscador();
     }
   });
 
   function abrirBuscador() {
-    inputBuscar.value = '';
-    document.getElementById('resultadosBusqueda').innerHTML = '';
-    document.getElementById('sinResultadosBusqueda').style.display = 'none';
+    inputBuscar.value = "";
+    document.getElementById("resultadosBusqueda").innerHTML = "";
+    document.getElementById("sinResultadosBusqueda").style.display = "none";
     modalBuscar.show();
-    buscarProductosAjax(''); // carga los primeros productos al abrir
+    buscarProductosAjax("");
   }
 
-  document.getElementById('modalBuscarProducto').addEventListener('shown.bs.modal', function () {
-    inputBuscar.focus();
-  });
+  document
+    .getElementById("modalBuscarProducto")
+    .addEventListener("shown.bs.modal", function () {
+      inputBuscar.focus();
+    });
 
   /* ============== BÚSQUEDA AJAX (con debounce) ============== */
-  inputBuscar.addEventListener('input', function () {
+  inputBuscar.addEventListener("input", function () {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => buscarProductosAjax(this.value.trim()), 250);
+    debounceTimer = setTimeout(
+      () => buscarProductosAjax(this.value.trim()),
+      250,
+    );
   });
 
   function buscarProductosAjax(query) {
@@ -176,40 +351,40 @@
         renderResultados();
       })
       .catch(() => {
-        document.getElementById('resultadosBusqueda').innerHTML =
+        document.getElementById("resultadosBusqueda").innerHTML =
           '<div class="text-danger p-3">Error al buscar productos.</div>';
       });
   }
 
   function renderResultados() {
-    const contenedor = document.getElementById('resultadosBusqueda');
-    const sinResultados = document.getElementById('sinResultadosBusqueda');
+    const contenedor = document.getElementById("resultadosBusqueda");
+    const sinResultados = document.getElementById("sinResultadosBusqueda");
 
     if (resultadosActuales.length === 0) {
-      contenedor.innerHTML = '';
-      sinResultados.style.display = '';
+      contenedor.innerHTML = "";
+      sinResultados.style.display = "";
       return;
     }
-    sinResultados.style.display = 'none';
+    sinResultados.style.display = "none";
 
-    let html = '';
+    let html = "";
     resultadosActuales.forEach((p, i) => {
       const agotado = p.stock <= 0;
       html += `
         <button type="button"
-            class="list-group-item list-group-item-action resultado-item ${i === indiceActivo ? 'activo' : ''} ${agotado ? 'agotado' : ''}"
+            class="list-group-item list-group-item-action resultado-item ${i === indiceActivo ? "activo" : ""} ${agotado ? "agotado" : ""}"
             onclick="seleccionarResultado(${i})"
             data-index="${i}">
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <span class="badge bg-light text-dark border me-2">${p.codigo}</span>
               <strong>${p.nombre}</strong>
-              ${p.tiene_iva ? '<span class="badge bg-secondary-subtle text-secondary ms-1">+IVA</span>' : ''}
+              ${p.tiene_iva ? '<span class="badge bg-secondary-subtle text-secondary ms-1">+IVA</span>' : ""}
             </div>
             <div class="text-end">
               <div class="fw-bold">$${p.precio.toFixed(2)}</div>
-              <div class="small ${agotado ? 'text-danger' : 'text-muted'}">
-                ${agotado ? 'Agotado' : 'Stock: ' + p.stock}
+              <div class="small ${agotado ? "text-danger" : "text-muted"}">
+                ${agotado ? "Agotado" : "Stock: " + p.stock}
               </div>
             </div>
           </div>
@@ -217,25 +392,24 @@
     });
     contenedor.innerHTML = html;
 
-    // asegura que el ítem activo esté visible al navegar con flechas
-    const activo = contenedor.querySelector('.resultado-item.activo');
-    if (activo) activo.scrollIntoView({ block: 'nearest' });
+    const activo = contenedor.querySelector(".resultado-item.activo");
+    if (activo) activo.scrollIntoView({ block: "nearest" });
   }
 
   /* ============== NAVEGACIÓN CON TECLADO DENTRO DEL MODAL ============== */
-  inputBuscar.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowDown') {
+  inputBuscar.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
       if (indiceActivo < resultadosActuales.length - 1) indiceActivo++;
       renderResultados();
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       if (indiceActivo > 0) indiceActivo--;
       renderResultados();
-    } else if (e.key === 'Enter') {
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (indiceActivo >= 0) seleccionarResultado(indiceActivo);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       modalBuscar.hide();
     }
   });
@@ -254,7 +428,11 @@
 
     if (fila) {
       if (fila.cantidad + 1 > producto.stock) {
-        Swal.fire("Stock insuficiente", `Solo hay ${producto.stock} unidades de ${producto.nombre}.`, "warning");
+        Swal.fire(
+          "Stock insuficiente",
+          `Solo hay ${producto.stock} unidades de ${producto.nombre}.`,
+          "warning",
+        );
         return;
       }
       fila.cantidad += 1;
@@ -283,7 +461,11 @@
     if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
 
     if (cantidad > fila.stock) {
-      Swal.fire("Stock insuficiente", `Solo hay ${fila.stock} unidades disponibles.`, "warning");
+      Swal.fire(
+        "Stock insuficiente",
+        `Solo hay ${fila.stock} unidades disponibles.`,
+        "warning",
+      );
       cantidad = fila.stock;
     }
 
@@ -311,7 +493,7 @@
   }
 
   function renderTabla() {
-    const tbody = document.getElementById('cuerpoPartidas');
+    const tbody = document.getElementById("cuerpoPartidas");
 
     if (partidas.length === 0) {
       tbody.innerHTML = `
@@ -325,7 +507,7 @@
       return;
     }
 
-    let html = '';
+    let html = "";
     partidas.forEach((p, index) => {
       html += `
         <tr>
@@ -333,7 +515,7 @@
           <td class="text-center"><span class="badge bg-light text-dark border">${p.codigo}</span></td>
           <td>
             ${p.nombre}
-            ${p.tieneIva ? '<span class="badge bg-secondary-subtle text-secondary ms-1">IVA</span>' : ''}
+            ${p.tieneIva ? '<span class="badge bg-secondary-subtle text-secondary ms-1">IVA</span>' : ""}
           </td>
           <td>
             <input type="number" min="1" max="${p.stock}" value="${p.cantidad}"
@@ -345,7 +527,7 @@
                 class="form-control form-control-sm celda-precio-valor"
                 onchange="onPrecioChange(${p.filaId}, this.value)">
           </td>
-          <td class="text-center">${p.tieneIva ? '16%' : '<span class="text-muted">—</span>'}</td>
+          <td class="text-center">${p.tieneIva ? "16%" : '<span class="text-muted">—</span>'}</td>
           <td class="celda-importe fw-semibold">$${p.importe.toFixed(2)}</td>
           <td class="text-center">
             <button class="btn btn-sm btn-link text-danger p-0" onclick="eliminarFila(${p.filaId})">
@@ -359,29 +541,49 @@
   }
 
   function actualizarResumen() {
-    let subtotal = 0;
+    let subtotalSinIva = 0;
     let iva = 0;
+    let total = 0;
 
     partidas.forEach((p) => {
-      subtotal += p.importe;
-      if (p.tieneIva) iva += p.importe * IVA_RATE;
+      total += p.importe; // el importe ya es el precio final (con IVA incluido)
+
+      if (p.tieneIva) {
+        // Si el producto lleva IVA, el precio $500 en realidad es:
+        // $431.03 (base) + $68.97 (IVA) = $500 con IVA
+        const baseSinIva = p.importe / (1 + IVA_RATE);
+        subtotalSinIva += baseSinIva;
+        iva += p.importe - baseSinIva;
+      } else {
+        subtotalSinIva += p.importe;
+      }
     });
 
-    const total = subtotal + iva;
-
-    document.getElementById('subtotal').innerText = subtotal.toFixed(2);
-    document.getElementById('ivaTotal').innerText = iva.toFixed(2);
-    document.getElementById('total').innerText = total.toFixed(2);
+    document.getElementById("subtotal").innerText = subtotalSinIva.toFixed(2);
+    document.getElementById("ivaTotal").innerText = iva.toFixed(2);
+    document.getElementById("total").innerText = total.toFixed(2);
   }
-
-  /* ============== COBRAR ============== */
+  /* ============== COBRAR / REGISTRAR A CRÉDITO ============== */
   function cobrar() {
     if (partidas.length === 0) {
-      Swal.fire("Sin productos", "Agrega al menos un producto a la nota.", "info");
+      Swal.fire(
+        "Sin productos",
+        "Agrega al menos un producto a la nota.",
+        "info",
+      );
       return;
     }
 
-    const total = parseFloat(document.getElementById('total').innerText);
+    if (modoVenta === "credito" && !clienteCreditoSeleccionado) {
+      Swal.fire(
+        "Falta el cliente",
+        "Selecciona un cliente de crédito.",
+        "warning",
+      );
+      return;
+    }
+
+    const total = parseFloat(document.getElementById("total").innerText);
     const carrito = partidas.map((p) => ({
       id: p.id,
       nombre: p.nombre,
@@ -390,13 +592,21 @@
       subtotal: p.importe,
     }));
 
+    const esCredito = modoVenta === "credito";
+    const tituloConfirmacion = esCredito
+      ? `¿Registrar venta a crédito de $${total.toFixed(2)}?`
+      : `¿Cobrar $${total.toFixed(2)}?`;
+    const textoConfirmacion = esCredito
+      ? `Cliente: ${clienteCreditoSeleccionado.nombre}`
+      : `${partidas.length} producto(s) en la nota`;
+
     Swal.fire({
-      title: `¿Cobrar $${total.toFixed(2)}?`,
-      text: `${partidas.length} producto(s) en la nota`,
-      icon: "question",
+      title: tituloConfirmacion,
+      text: textoConfirmacion,
+      icon: esCredito ? "warning" : "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, cobrar",
-      confirmButtonColor: "#1cc88a",
+      confirmButtonText: esCredito ? "Sí, registrar" : "Sí, cobrar",
+      confirmButtonColor: esCredito ? "#d63131" : "#1cc88a",
     }).then((result) => {
       if (!result.isConfirmed) return;
 
@@ -406,19 +616,48 @@
           "Content-Type": "application/json",
           "X-CSRFToken": "{{ csrf_token }}",
         },
-        body: JSON.stringify({ carrito: carrito, total: total }),
+        body: JSON.stringify({
+          carrito: carrito,
+          total: total,
+          es_credito: esCredito,
+          cliente_credito_id: esCredito ? clienteCreditoSeleccionado.id : null,
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
           if (data.ok) {
-            Swal.fire("Venta registrada", `Venta #${data.venta_id} guardada correctamente.`, "success")
-              .then(() => { window.location.href = "/ventas_historial/"; });
+            if (data.tipo === "credito") {
+              Swal.fire(
+                "Registrado",
+                "El cargo se agregó a la cuenta del cliente.",
+                "success",
+              ).then(() => {
+                window.location.href =
+                  "{% url 'inventario:clientes_credito_lista' %}";
+              });
+            } else {
+              Swal.fire(
+                "Venta registrada",
+                `Venta #${data.venta_id} guardada correctamente.`,
+                "success",
+              ).then(() => {
+                window.location.href = "/ventas_historial/";
+              });
+            }
           } else {
-            Swal.fire("Error", data.error || "No se pudo guardar la venta.", "error");
+            Swal.fire(
+              "Error",
+              data.error || "No se pudo guardar la venta.",
+              "error",
+            );
           }
         })
         .catch(() => {
-          Swal.fire("Error de red", "Ocurrió un error al procesar la petición.", "error");
+          Swal.fire(
+            "Error de red",
+            "Ocurrió un error al procesar la petición.",
+            "error",
+          );
         });
     });
   }

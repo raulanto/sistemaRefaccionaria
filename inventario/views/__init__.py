@@ -8,3 +8,4 @@ from .ventas_Views import *
 from .ticket_Views import *
 from .inventarioMovimientos_Views import *
 from .kardex_Views import *
+from .credito_Views import *

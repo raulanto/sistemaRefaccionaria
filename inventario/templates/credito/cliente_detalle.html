@@ -1,0 +1,197 @@
+{% extends 'base/body.html' %}
+{% block headercontect %}
+{% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid mt-n10">
+  <div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span><i class="fas fa-user-tie text-primary"></i> {{ cliente.nombre }}</span>
+      <div class="d-flex gap-2">
+        <a href="{% url 'inventario:detalle_cliente_credito_pdf' cliente.id %}" class="btn btn-outline-danger btn-sm mr-2">
+          <i class="fas fa-file-pdf"></i> Descargar PDF
+        </a>
+        <a href="{% url 'inventario:clientes_credito_lista' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-left"></i> Volver
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="row g-2 mb-4">
+        <div class="col-md-4">
+          <div class="border rounded p-3 text-center">
+            <div class="text-muted small">Saldo actual (te debe)</div>
+            <div class="h3 {% if saldo_actual > 0 %}text-danger{% else %}text-success{% endif %}">
+              ${{ saldo_actual }}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8 d-flex align-items-center gap-2">
+          <button class="btn btn-danger flex-fill" onclick="abrirMovimiento('CARGO')">
+            <i class="fas fa-plus-circle"></i> Registrar envío (cargo)
+          </button>
+          <button class="btn btn-success flex-fill" onclick="abrirMovimiento('ABONO')">
+            <i class="fas fa-hand-holding-usd"></i> Registrar pago (abono)
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead class="table-light text-center small text-uppercase text-muted">
+            <tr>
+              <th>Fecha</th>
+              <th>Concepto</th>
+              <th>Cargo</th>
+              <th>Abono</th>
+              <th>Saldo</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in movimientos %}
+            <tr class="{% if m.cancelado %}text-muted{% endif %}"
+              style="{% if m.cancelado %}text-decoration: line-through;{% endif %}">
+              <td class="small">{{ m.fecha|date:"d/m/Y H:i" }}</td>
+              <td class="small">
+                {{ m.concepto|default:"—" }}
+                {% if m.cancelado %}<span class="badge bg-secondary ms-1">Cancelado</span>{% endif %}
+              </td>
+              <td class="text-center text-danger">{{ m.cargo|default:"—" }}</td>
+              <td class="text-center text-success">{{ m.abono|default:"—" }}</td>
+              <td class="text-center fw-bold">${{ m.saldo }}</td>
+              <td class="text-center">
+                {% if not m.cancelado %}
+                <button class="btn btn-sm btn-link text-danger p-0" onclick="cancelarMovimiento({{ m.id }})"
+                  title="Cancelar">
+                  <i class="fas fa-times-circle"></i>
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">Sin movimientos registrados.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR MOVIMIENTO -->
+<div class="modal fade" id="modalMovimiento" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tituloModalMovimiento">Registrar movimiento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Monto</label>
+          <input type="number" step="0.01" id="inputMonto" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Concepto</label>
+          <input type="text" id="inputConcepto" class="form-control"
+            placeholder="Ej. Envío de balatas, Pago parcial...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="guardarMovimiento()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  let tipoActual = null;
+  const modal = new bootstrap.Modal(document.getElementById('modalMovimiento'));
+
+  function abrirMovimiento(tipo) {
+    tipoActual = tipo;
+    document.getElementById('tituloModalMovimiento').innerText =
+      tipo === 'CARGO' ? 'Registrar envío (cargo)' : 'Registrar pago (abono)';
+    document.getElementById('inputMonto').value = '';
+    document.getElementById('inputConcepto').value = '';
+    modal.show();
+  }
+
+  function guardarMovimiento() {
+    const monto = parseFloat(document.getElementById('inputMonto').value);
+    const concepto = document.getElementById('inputConcepto').value;
+
+    if (!monto || monto <= 0) {
+      Swal.fire('Monto inválido', 'Ingresa un monto mayor a cero.', 'warning');
+      return;
+    }
+
+    fetch("{% url 'inventario:registrar_movimiento_credito' cliente.id %}", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+      body: JSON.stringify({ tipo: tipoActual, monto: monto, concepto: concepto }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.estado === 'ok') {
+          modal.hide();
+          Swal.fire('Listo', 'Movimiento registrado.', 'success').then(() => location.reload());
+        } else {
+          Swal.fire('Error', data.mensaje, 'error');
+        }
+      });
+  }
+
+  // 🚨 Función que se ejecuta cuando das click en "Cancelar" un movimiento
+  function cancelarMovimiento(movimientoId) {
+    // ⚠️ Mostramos alerta de confirmación al usuario
+    Swal.fire({
+      title: "¿Cancelar este movimiento?",
+      text: "El saldo se recalculará sin contarlo, pero quedará visible como cancelado",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cancelar",
+    }).then((result) => {
+      // ✔️ Si el usuario confirma la acción
+      if (result.isConfirmed) {
+        // 🌐 Enviamos petición a Django (backend)
+        fetch(`/credito/movimiento/${movimientoId}/cancelar/`, {
+          method: "POST",
+          headers: {
+            // 🔐 Protección de Django contra ataques (CSRF)
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          // 📥 Convertimos la respuesta del servidor a JSON
+          .then((response) => response.json())
+
+          // 📊 Procesamos la respuesta
+          .then((data) => {
+            // ✅ Si todo salió bien en Django
+            if (data.estado == "ok") {
+              Swal.fire(
+                "Cancelado",
+                "El movimiento fue cancelado correctamente",
+                "success",
+              );
+              // 🔄 Recargamos la página para ver cambios en la tabla
+              location.reload();
+            } else {
+              // ❌ Si hubo error
+              Swal.fire("Error", data.mensaje, "error");
+            }
+          });
+      }
+    });
+  }
+</script>
+{% endblock %}
