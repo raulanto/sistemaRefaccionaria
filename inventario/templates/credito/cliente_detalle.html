@@ -122,8 +122,8 @@
     tipoActual = tipo;
     document.getElementById('tituloModalMovimiento').innerText =
       tipo === 'CARGO' ? 'Registrar envío (cargo)' : 'Registrar pago (abono)';
-    document.getElementById('inputMonto').value = '';
     document.getElementById('inputConcepto').value = '';
+    document.getElementById('inputMonto').value = '';
     modal.show();
   }
 
@@ -151,7 +151,6 @@
         }
       });
   }
-
   // 🚨 Función que se ejecuta cuando das click en "Cancelar" un movimiento
   function cancelarMovimiento(movimientoId) {
     // ⚠️ Mostramos alerta de confirmación al usuario

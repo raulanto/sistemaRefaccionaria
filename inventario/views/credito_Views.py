@@ -78,41 +78,34 @@ class ClienteCreditoCrearView(View):
 
 
 def registrar_movimiento_credito(request, cliente_id):
-        if request.method != "POST":
-            return JsonResponse({'estado': 'error', 'mensaje': 'Método no permitido'})
+    if request.method != "POST":
+        return JsonResponse({'estado': 'error', 'mensaje': 'Método no permitido'})
 
-        try:
-            data = json.loads(request.body)
-            tipo = data.get('tipo')
-            items = data.get('items', [])
+    try:
+        data = json.loads(request.body)
+        tipo = data.get('tipo')
+        monto = float(data.get('monto'))
+        concepto = data.get('concepto', '')
 
-            if not items:
-                return JsonResponse({'estado': 'error', 'mensaje': 'Agrega al menos un concepto.'})
+        if monto <= 0:
+            return JsonResponse({'estado': 'error', 'mensaje': 'El monto debe ser mayor a cero.'})
 
-            monto_total = sum(item['cantidad'] * item['precio'] for item in items)
-            if monto_total <= 0:
-                return JsonResponse({'estado': 'error', 'mensaje': 'El monto debe ser mayor a cero.'})
+        if tipo == 'CARGO':
+            CreditoService.registrar_cargo(
+                cliente_id=cliente_id, monto=monto, concepto=concepto,
+                usuario=request.user if request.user.is_authenticated else None,
+            )
+        elif tipo == 'ABONO':
+            CreditoService.registrar_abono(
+                cliente_id=cliente_id, monto=monto, concepto=concepto,
+                usuario=request.user if request.user.is_authenticated else None,
+            )
+        else:
+            return JsonResponse({'estado': 'error', 'mensaje': 'Tipo inválido'})
 
-            concepto_resumen = ", ".join([f"{item['cantidad']}x {item['concepto']}" for item in items])
-
-            if tipo == 'CARGO':
-                CreditoService.registrar_cargo(
-                    cliente_id=cliente_id, monto=monto_total, concepto=concepto_resumen,
-                    usuario=request.user if request.user.is_authenticated else None,
-                    items=items,
-                )
-            elif tipo == 'ABONO':
-                CreditoService.registrar_abono(
-                    cliente_id=cliente_id, monto=monto_total, concepto=concepto_resumen,
-                    usuario=request.user if request.user.is_authenticated else None,
-                )
-            else:
-                return JsonResponse({'estado': 'error', 'mensaje': 'Tipo inválido'})
-
-            return JsonResponse({'estado': 'ok'})
-        except Exception as e:
-            return JsonResponse({'estado': 'error', 'mensaje': str(e)})
-        
+        return JsonResponse({'estado': 'ok'})
+    except Exception as e:
+        return JsonResponse({'estado': 'error', 'mensaje': str(e)})    
         
 def detalle_cliente_credito_pdf(request, cliente_id):
     """PDF con el historial completo de UN cliente de crédito."""
@@ -190,6 +183,19 @@ class ClienteCreditoEditarView(View):
         cliente.save()
         return redirect('inventario:detalle_cliente_credito', cliente_id=cliente.id)
 
+        
+@staticmethod
+def registrar_cargo(cliente_id, monto, concepto='', usuario=None, items=None):
+    """
+    items: lista de dicts [{concepto, cantidad, precio}, ...] — conceptos libres,
+    no necesariamente productos reales del inventario.
+    """
+    cliente = ClienteCredito.objects.get(id=cliente_id)
+    return MovimientoCredito.objects.create(
+        cliente=cliente, tipo='CARGO', monto=monto, concepto=concepto, usuario=usuario,
+        productos_json=items or [],
+    )
+
 def EliminarClienteAjax(request, pk):
     if request.method == "POST":
         #cliente manda a llamar a la funcion y busca el cliente con el id que se le pasa, si no lo encuentra manda un error 404
@@ -205,52 +211,3 @@ def EliminarClienteAjax(request, pk):
                     "mensaje": "No se puede eliminar porque el cliente ya tiene transacciones.",
                 }
             )
-            
-@staticmethod
-def registrar_cargo(cliente_id, monto, concepto='', usuario=None, items=None):
-    """
-    items: lista de dicts [{concepto, cantidad, precio}, ...] — conceptos libres,
-    no necesariamente productos reales del inventario.
-    """
-    cliente = ClienteCredito.objects.get(id=cliente_id)
-    return MovimientoCredito.objects.create(
-        cliente=cliente, tipo='CARGO', monto=monto, concepto=concepto, usuario=usuario,
-        productos_json=items or [],
-    )
-
-def nota_movimiento_credito(request, movimiento_id):
-    """Genera una nota imprimible de un movimiento específico (cargo o abono)."""
-    movimiento = get_object_or_404(MovimientoCredito, id=movimiento_id)
-
-    lineas = []
-    if movimiento.productos_json:
-        for item in movimiento.productos_json:
-            if 'producto_id' in item:
-                try:
-                    nombre = Producto.objects.get(id=item['producto_id']).nombre
-                except Producto.DoesNotExist:
-                    nombre = "Producto eliminado"
-            else:
-                nombre = item.get('concepto', 'Concepto')
-
-            cantidad = item['cantidad']
-            precio = item['precio']
-            lineas.append({
-                'concepto': nombre,
-                'cantidad': cantidad,
-                'precio': precio,
-                'subtotal': cantidad * precio,
-            })
-    else:
-        lineas.append({
-            'concepto': movimiento.concepto or ('Cargo' if movimiento.tipo == 'CARGO' else 'Abono'),
-            'cantidad': 1,
-            'precio': movimiento.monto,
-            'subtotal': movimiento.monto,
-        })
-
-    return render(request, 'credito/nota_movimiento.html', {
-        'movimiento': movimiento,
-        'lineas': lineas,
-        'fecha_generacion': django_timezone.localtime(),
-    })

@@ -84,11 +84,12 @@
                     <div class="col-md-4 mb-3">
                         <label>Precio de Venta (sin IVA)</label>
                         <input type="number" step="0.01" id="inputPrecioVenta" name="precio_venta" class="form-control"
-                            value="{{ form.precio_venta.value|default:'0' }}" readonly>
+                             readonly>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Precio Final (con IVA)</label>
-                        <input type="number" step="0.01" id="inputPrecioConIva" class="form-control">
+                        <input type="number" step="0.01" id="inputPrecioConIva" class="form-control
+                        value="{{ form.precio_venta.value|default:'0' }}"">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Utilidad Real</label>
