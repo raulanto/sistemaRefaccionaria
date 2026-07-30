@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'simple_history',
     'webpack_loader',
     'catalogo',
+    'django.contrib.humanize',
+
 
 ]
 

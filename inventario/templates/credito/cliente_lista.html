@@ -1,4 +1,5 @@
 {% extends 'base/body.html' %}
+{% load humanize %}
 {% block headercontect %}
 {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
@@ -16,7 +17,7 @@
 
       <div class="alert alert-light border d-flex justify-content-between align-items-center mb-3">
         <span>Total que te deben (todos los clientes)</span>
-        <strong class="text-danger">${{ total_general }}</strong>
+        <strong class="text-danger">${{ total_general|intcomma }}</strong>
       </div>
 
       <div class="mb-3">
@@ -42,15 +43,17 @@
             <tr id="fila-cliente-{{ item.cliente.id }}" data-nombre="{{ item.cliente.nombre|lower }}"
               data-contacto="{{ item.cliente.contacto|lower }}">
               <td>{{ item.cliente.nombre }}</td>
-              <td class="text-muted small">{{ item.cliente.contacto|default:"—" }} · {{ item.cliente.telefono|default:"" }}</td>
+              <td class="text-muted small">{{ item.cliente.contacto|default:"—" }} · {{ item.cliente.telefono|default:""}}</td>
               <td class="text-end fw-bold {% if item.saldo > 0 %}text-danger{% else %}text-success{% endif %}">
-                ${{ item.saldo }}
+                ${{ item.saldo|intcomma }}
               </td>
               <td class="text-end">
                 <a href="{% url 'inventario:detalle_cliente_credito' item.cliente.id %}"
                   class="btn btn-sm btn-outline-primary">
                   Ver detalle
                 </a>
+                <button onclick="alertaEliminar('{{item.cliente.id}}','{{ item.cliente.nombre }}')"
+                  class="btn btn-danger btn-sm">Eliminar</button>
               </td>
             </tr>
             {% empty %}
@@ -161,6 +164,8 @@
 {% endblock %}
 
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
   function abrirModalCliente() {
     document.getElementById('overlayModalCliente').style.display = 'flex';
@@ -189,5 +194,44 @@
 
     document.getElementById('sinResultadosBusqueda').style.display = visibles === 0 ? '' : 'none';
   });
+
+  function alertaEliminar(id, nombre) {
+    Swal.fire({
+      title: `¿Estás seguro de eliminar el cliente "${nombre}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, borrar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("/eliminarCliente/" + id + "/", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.estado == "ok") {
+              Swal.fire({
+                title: "Eliminado",
+                text: "El producto fue eliminado correctamente",
+                icon: "success",
+              });
+
+              document.getElementById("fila-cliente-" + id).remove();
+            } else {
+              Swal.fire({
+                title: "No se puede eliminar",
+                text: data.mensaje,
+                icon: "error",
+              });
+            }
+          });
+      }
+    });
+  }
+  
 </script>
 {% endblock %}

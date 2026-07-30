@@ -2,7 +2,7 @@
     <nav class="sidenav shadow-right sidenav-light">
         <div class="sidenav-menu">
             <div class="nav accordion" id="accordionSidenav">
-                <!-- Barra lateral dashboard!-->
+                <!-- OPCIONES: Dashboard y Ventas -->
                 <div class="sidenav-menu-heading">Opciones</div>
                 <a class="nav-link" href="{% url 'inventario:dashboard' %}">
                     <div class="nav-link-icon"><i data-feather="layout"></i></div>
@@ -33,23 +33,34 @@
                     Salida de inventario
                 </a>
                 <a class="nav-link" href="{% url 'inventario:historial_movimientos' %}">
-                    <div class="nav-link-icon"><i data-feather="file-text"></i></div>
+                    <div class="nav-link-icon"><i data-feather="list"></i></div>
                     Historial de movimientos
                 </a>
                 <a class="nav-link" href="{% url 'inventario:kardex_producto' %}">
-                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
+                    <div class="nav-link-icon"><i data-feather="book-open"></i></div>
                     Kardex de producto
                 </a>
-                
-                <!-- Barra lateral TABLA INVENTARIO -->
+
+                <!-- CRÉDITO -->
+                <div class="sidenav-menu-heading">Crédito</div>
+                <a class="nav-link" href="{% url 'inventario:clientes_credito_lista' %}">
+                    <div class="nav-link-icon"><i data-feather="credit-card"></i></div>
+                    Clientes de crédito
+                </a>
+
+                <!-- INVENTARIO -->
                 <div class="sidenav-menu-heading">Inventario</div>
                 <a class="nav-link" href="{% url 'inventario:productoLista' %}">
                     <div class="nav-link-icon"><i data-feather="box"></i></div>
                     Productos
                 </a>
                 <a class="nav-link" href="{% url 'inventario:categoriaLista' %}">
-                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
+                    <div class="nav-link-icon"><i data-feather="grid"></i></div>
                     Categorías
+                </a>
+                <a class="nav-link" href="{% url 'inventario:marcaProductoLista' %}">
+                    <div class="nav-link-icon"><i data-feather="bookmark"></i></div>
+                    Marcas de productos
                 </a>
                 <a class="nav-link" href="{% url 'inventario:proveedorEmpresaLista' %}">
                     <div class="nav-link-icon"><i data-feather="truck"></i></div>
@@ -59,15 +70,6 @@
                     <div class="nav-link-icon"><i data-feather="phone"></i></div>
                     Contacto proveedor
                 </a>
-                <a class="nav-link" href="{% url 'inventario:marcaProductoLista' %}">
-                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
-                    Marcas de productos
-                </a>
-                <a class="nav-link" href="{% url 'inventario:clientes_credito_lista' %}">
-                    <div class="nav-link-icon"><i data-feather="tag"></i></div>
-                    Clientes de crédito
-                </a>
-                
 
                 <!--
                 <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse"
