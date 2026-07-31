@@ -45,6 +45,12 @@ class ProductoCrearView(CreateView):
     form_class = ProductoForm
     template_name = "producto/producto_crear.html"
     success_url = reverse_lazy("inventario:productoLista")
+    
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context["titulo"] = "Crear Producto"
+            context["mensaje"] = "Completa el formulario para crear un nuevo producto"
+            return context
 
     def form_valid(self, form):
         response = super().form_valid(
@@ -65,7 +71,6 @@ class ProductoCrearView(CreateView):
                     self.request.user if self.request.user.is_authenticated else None
                 ),
             )
-
         return response
 
 

@@ -107,10 +107,8 @@ const BuscadorProducto = (function () {
             <div>
               <span class="badge bg-light text-dark border me-2">${p.codigo}</span>
               <strong>${p.nombre}</strong>
-              ${p.tiene_iva ? '<span class="badge bg-secondary-subtle text-secondary ms-1">+IVA</span>' : ''}
             </div>
             <div class="text-end">
-              <div class="fw-bold">$${p.precio.toFixed(2)}</div>
               <div class="small ${sinStock ? 'text-danger' : 'text-muted'}">
                 ${sinStock ? 'Agotado' : 'Stock: ' + p.stock}
               </div>

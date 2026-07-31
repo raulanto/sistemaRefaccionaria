@@ -19,184 +19,210 @@
         <div class="card-body">
             <form method="POST" class="form-compacto">
                 {% csrf_token %}
+
                 <!-- ========================= -->
                 <!-- INFORMACIÓN GENERAL -->
                 <!-- ========================= -->
-
-                <h5 class="text-red mb-3">
-                    Información General
-                </h5>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label>Código</label>
-                        {{ form.codigo }}
+                <div class="seccion">
+                    <h5 class="seccion-titulo">Información General</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.codigo.id_for_label }}">Código</label>
+                            {{ form.codigo }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.codigo_barras.id_for_label }}">Código de Barras</label>
+                            {{ form.codigo_barras }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.estado.id_for_label }}">Estado</label>
+                            {{ form.estado }}
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Código de Barras</label>
-                        {{ form.codigo_barras }}
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.nombre.id_for_label }}">Nombre del Producto</label>
+                            {{ form.nombre }}
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Estado</label>
-                        {{ form.estado }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label>Nombre del Producto</label>
-                        {{ form.nombre }}
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label>Descripción</label>
-                        {{ form.descripcion }}
+                    <div class="row">
+                        <div class="col-md-12 mb-0">
+                            <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+                            {{ form.descripcion }}
+                        </div>
                     </div>
                 </div>
-                <hr>
 
                 <!-- ========================= -->
                 <!-- PRECIOS -->
                 <!-- ========================= -->
-
-                <h5 class="text-red mb-3">
-                    Precios
-                </h5>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label>Costo</label>
-                        <input type="number" step="0.01" id="inputCosto" name="precio_compra" class="form-control"
-                            value="{{ form.precio_compra.value|default:'0' }}" required>
+                <div class="seccion">
+                    <h5 class="seccion-titulo">Precios</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="inputCosto">Costo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" id="inputCosto" name="precio_compra"
+                                    class="form-control campo-dinero" placeholder="0.00"
+                                    value="{{ form.precio_compra.value|default_if_none:'' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="selectTieneIva">¿Lleva IVA?</label>
+                            <select id="selectTieneIva" name="tiene_iva" class="form-control">
+                                <option value="True" {% if form.tiene_iva.value %}selected{% endif %}>Sí</option>
+                                <option value="False" {% if not form.tiene_iva.value %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="inputIva">IVA</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="inputIva" class="form-control" value="16">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="inputCostoConIva">Costo + IVA</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" id="inputCostoConIva" class="form-control campo-calculado" readonly>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label>% Utilidad</label>
-                        <input type="number" step="0.01" id="inputMargen" class="form-control" value="30">
+                    <div class="row align-items-end">
+                        <div class="col-md-3 mb-3">
+                            <label for="inputMargen">Margen de Ganancia</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" id="inputMargen" class="form-control campo-dinero"
+                                    placeholder="0.00" value="{{ margen_inicial|default:'30' }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="inputPrecioVenta" class="label-precio-venta">
+                                Precio de Venta
+                                <small>con IVA · editable</small>
+                            </label>
+                            <div class="input-group grupo-precio-venta">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" id="inputPrecioVenta" name="precio_venta"
+                                    class="form-control campo-dinero campo-precio-venta" placeholder="0.00"
+                                    value="{{ form.precio_venta.value|default_if_none:'' }}">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label>¿Lleva IVA?</label>
-                        <select id="selectTieneIva" name="tiene_iva" class="form-control">
-                            <option value="True" {% if form.tiene_iva.value %}selected{% endif %}>Sí</option>
-                            <option value="False" {% if not form.tiene_iva.value %}selected{% endif %}>No</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.precio_mayoreo.id_for_label }}">Precio Mayoreo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.precio_mayoreo }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-0">
+                            <label for="{{ form.cantidad_mayoreo.id_for_label }}">Cantidad Mayoreo</label>
+                            {{ form.cantidad_mayoreo }}
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label>Precio de Venta (sin IVA)</label>
-                        <input type="number" step="0.01" id="inputPrecioVenta" name="precio_venta" class="form-control"
-                             readonly>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Precio Final (con IVA)</label>
-                        <input type="number" step="0.01" id="inputPrecioConIva" class="form-control
-                        value="{{ form.precio_venta.value|default:'0' }}"">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Utilidad Real</label>
-                        <input type="text" id="labelMargenReal" class="form-control" value="30%" readonly>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label>Precio Mayoreo</label>
-                        {{ form.precio_mayoreo }}
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Cantidad Mayoreo</label>
-                        {{ form.cantidad_mayoreo }}
-                    </div>
-                </div>
-                <hr>
-
 
                 <!-- ========================= -->
                 <!-- INVENTARIO -->
                 <!-- ========================= -->
-
-                <h5 class="text-red mb-3">
-                    Inventario
-                </h5>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label>Stock Actual</label>
-                        {{ form.stock }}
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Stock Mínimo</label>
-                        {{ form.stock_minimo }}
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label>Unidad de Medida</label>
-                        {{ form.unidad_medida }}
+                <div class="seccion">
+                    <h5 class="seccion-titulo">Inventario</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-0">
+                            <label for="{{ form.stock.id_for_label }}">Stock Actual</label>
+                            {{ form.stock }}
+                        </div>
+                        <div class="col-md-4 mb-0">
+                            <label for="{{ form.stock_minimo.id_for_label }}">Stock Mínimo</label>
+                            {{ form.stock_minimo }}
+                        </div>
+                        <div class="col-md-4 mb-0">
+                            <label for="{{ form.unidad_medida.id_for_label }}">Unidad de Medida</label>
+                            {{ form.unidad_medida }}
+                        </div>
                     </div>
                 </div>
-                <hr>
 
                 <!-- ========================= -->
                 <!-- CLASIFICACIÓN -->
                 <!-- ========================= -->
-
-                <h5 class="text-red mb-3">
-                    Clasificación
-                </h5>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label>Categoría</label>
-                        <input type="text" list="listaCategorias" class="form-control" autocomplete="off"
-                            placeholder="Escribe para buscar..."
-                            value="{% if form.instance.categoria %}{{ form.instance.categoria.nombre }}{% endif %}"
-                            onchange="buscarYSeleccionar(this, 'id_categoria', categorias)">
-                        <datalist id="listaCategorias">
-                            {% for c in form.fields.categoria.queryset %}<option value="{{ c.nombre }}">{% endfor %}
-                        </datalist>
-                        <select id="id_categoria" name="categoria" style="display:none;">
-                            <option value="">---------</option>
-                            {% for c in form.fields.categoria.queryset %}
-                            <option value="{{ c.id }}" {% if form.instance.categoria_id == c.id %}selected{% endif %}>{{
-                                c.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Marca</label>
-                        <input type="text" list="listaMarcas" class="form-control" autocomplete="off"
-                            placeholder="Escribe para buscar..."
-                            value="{% if form.instance.marca %}{{ form.instance.marca.nombre }}{% endif %}"
-                            onchange="buscarYSeleccionar(this, 'id_marca', marcas)">
-                        <datalist id="listaMarcas">
-                            {% for m in form.fields.marca.queryset %}<option value="{{ m.nombre }}">{% endfor %}
-                        </datalist>
-                        <select id="id_marca" name="marca" style="display:none;">
-                            <option value="">---------</option>
-                            {% for m in form.fields.marca.queryset %}
-                            <option value="{{ m.id }}" {% if form.instance.marca_id == m.id %}selected{% endif %}>{{
-                                m.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                <div class="seccion">
+                    <h5 class="seccion-titulo">Clasificación</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-0">
+                            <label for="inputCategoriaBusqueda">Categoría</label>
+                
+                            <input type="text" id="inputCategoriaBusqueda" list="listaCategorias" class="form-control"
+                                autocomplete="off" placeholder="Escribe para buscar..."
+                                value="{% if form.instance.categoria %}{{ form.instance.categoria.nombre }}{% endif %}"
+                                onchange="buscarYSeleccionar(this, 'id_categoria')">
+                
+                            <datalist id="listaCategorias">
+                                {% for c in form.fields.categoria.queryset %}
+                                <option value="{{ c.nombre }}">
+                                    {% endfor %}
+                            </datalist>
+                
+                            <select id="id_categoria" name="categoria" style="display:none;">
+                                <option value="">---------</option>
+                                {% for c in form.fields.categoria.queryset %}
+                                <option value="{{ c.id }}" {% if form.instance.categoria_id == c.id %}selected{% endif %}>
+                                    {{ c.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                
+                        <div class="col-md-6 mb-0">
+                            <label for="inputMarcaBusqueda">Marca</label>
+                
+                            <input type="text" id="inputMarcaBusqueda" list="listaMarcas" class="form-control" autocomplete="off"
+                                placeholder="Escribe para buscar..."
+                                value="{% if form.instance.marca %}{{ form.instance.marca.nombre }}{% endif %}"
+                                onchange="buscarYSeleccionar(this, 'id_marca')">
+                
+                            <datalist id="listaMarcas">
+                                {% for m in form.fields.marca.queryset %}
+                                <option value="{{ m.nombre }}">
+                                    {% endfor %}
+                            </datalist>
+                
+                            <select id="id_marca" name="marca" style="display:none;">
+                                <option value="">---------</option>
+                                {% for m in form.fields.marca.queryset %}
+                                <option value="{{ m.id }}" {% if form.instance.marca_id == m.id %}selected{% endif %}>
+                                    {{ m.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <hr>
 
                 <!-- ========================= -->
                 <!-- PROVEEDOR -->
                 <!-- ========================= -->
-
-                <h5 class="text-red mb-3">
-                    Proveedor
-                </h5>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="text-black">Proveedor Principal</label>
-                        {{ form.proveedor_principal }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Contacto del Proveedor</label>
-                        {{ form.contacto_proveedor }}
+                <div class="seccion">
+                    <h5 class="seccion-titulo">Proveedor</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-0">
+                            <label for="{{ form.proveedor_principal.id_for_label }}">Proveedor Principal</label>
+                            {{ form.proveedor_principal }}
+                        </div>
+                        <div class="col-md-6 mb-0">
+                            <label for="{{ form.contacto_proveedor.id_for_label }}">Contacto del Proveedor</label>
+                            {{ form.contacto_proveedor }}
+                        </div>
                     </div>
                 </div>
-                <hr>
+
                 <!-- BOTONES -->
-                <div class="text-end">
+                <div class="text-end botones">
                     <button type="reset" class="btn btn-warning">
                         <i class="fas fa-eraser"></i>
                         Limpiar
@@ -212,60 +238,144 @@
 </div>
 
 <style>
-    /* Formulario compacto: reduce el tamaño de TODOS los campos dentro de .form-compacto,
-       sin importar si vienen de Django ({{ form.campo }}) o se escribieron a mano. */
+    /* Todas las secciones se ven exactamente igual */
+    .seccion {
+        border: 1px solid #e3e6ea;
+        border-radius: .4rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .seccion-titulo {
+        font-size: .9rem;
+        font-weight: 600;
+        color: #c0392b;
+        margin-bottom: 1rem;
+        padding-bottom: .5rem;
+        border-bottom: 1px solid #eef0f2;
+    }
+
+    /* Campos */
     .form-compacto label {
-        font-size: .85rem;
-        margin-bottom: .25rem;
+        font-size: .8rem;
+        margin-bottom: .3rem;
         font-weight: 500;
-        color: black;
+        color: #333;
     }
 
     .form-compacto .form-control,
     .form-compacto .form-select {
-        padding: .25rem .5rem;
+        padding: .35rem .6rem;
         font-size: .875rem;
-        min-height: calc(1.5em + .5rem + 2px);
+        min-height: calc(1.5em + .7rem + 2px);
+        border: 1px solid #dde1e6;
+    }
+
+    .form-compacto .form-control:focus,
+    .form-compacto .form-select:focus {
+        border-color: #c0392b;
+        box-shadow: 0 0 0 .12rem rgba(192, 57, 43, .12);
     }
 
     .form-compacto textarea.form-control {
         min-height: auto;
     }
 
-    .form-compacto .row {
-        margin-bottom: -.5rem;
+    /* Prefijos $ y % */
+    .form-compacto .input-group-text {
+        padding: .35rem .6rem;
+        font-size: .875rem;
+        background-color: #f4f5f7;
+        border: 1px solid #dde1e6;
+        color: #6c757d;
     }
 
-    .form-compacto .row>div {
-        margin-bottom: .75rem;
+    /* Campos calculados (solo lectura) */
+    .campo-calculado {
+        background-color: #f4f5f7 !important;
+        color: #495057;
+        font-weight: 600;
     }
 
-    .form-compacto h5 {
-        font-size: 1rem;
-        margin-bottom: .75rem !important;
+    /* Precio de venta: es el dato final, se destaca del resto */
+    .label-precio-venta {
+        color: #1e7e34 !important;
+        font-weight: 600 !important;
     }
 
-    .form-compacto hr {
-        margin: .75rem 0;
+    .label-precio-venta small {
+        font-weight: 400;
+        color: #7a9d85;
+        font-size: .72rem;
+        margin-left: .35rem;
+    }
+
+    .form-compacto .grupo-precio-venta .input-group-text {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.05rem;
+        padding: .35rem .85rem;
+    }
+
+    .form-compacto .campo-precio-venta {
+        background-color: #f4fbf6;
+        border-color: #28a745;
+        color: #1e7e34;
+        font-weight: 700;
+        font-size: 1.15rem;
+        min-height: calc(1.5em + .9rem + 2px);
+    }
+
+    .form-compacto .campo-precio-venta:focus {
+        background-color: #fff;
+        border-color: #28a745;
+        box-shadow: 0 0 0 .15rem rgba(40, 167, 69, .18);
+    }
+
+    /* Oculta las flechitas de los inputs numéricos */
+    .form-compacto input[type=number]::-webkit-outer-spin-button,
+    .form-compacto input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .form-compacto input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .botones {
+        padding-top: .5rem;
+    }
+
+    .botones .btn i {
+        margin-right: .3rem;
     }
 </style>
 
 {% endblock %}
 {% load static %}
 {% block script %}
-<script src="{% static 'js/calculadora-precios.js' %}"></script>
 <script>
-    const categorias = [
-        {% for c in form.fields.categoria.queryset %}{ id: {{ c.id }}, nombre: "{{ c.nombre|escapejs }}" },{% endfor %}
-    ];
-    const marcas = [
-        {% for m in form.fields.marca.queryset %}{ id: {{ m.id }}, nombre: "{{ m.nombre|escapejs }}" },{% endfor %}
-    ];
-
-    function buscarYSeleccionar(input, selectId, lista) {
-        const encontrado = lista.find(item => item.nombre === input.value.trim());
-        document.getElementById(selectId).value = encontrado ? encontrado.id : '';
-        input.classList.toggle('is-invalid', !encontrado);
+    // Solo lo que necesita variables de Django vive aquí.
+    // Toda la logica de calculo esta en calculadora-precios.js
+    function buscarYSeleccionar(input, selectID){
+    const select = document.getElementById(selectID);
+    const texto = input.value.trim().toLowerCase();
+    let encontrado = false;
+    for(const opcion of select.options){
+        if(opcion.text.trim().toLowerCase() === texto){
+            select.value = opcion.value;
+            encontrado = true;
+            break;
+        }
     }
+    if(!encontrado){
+        select.value = "";
+    }
+
+}
 </script>
+<script src="{% static 'js/calculadora-precios.js' %}"></script>
 {% endblock %}
