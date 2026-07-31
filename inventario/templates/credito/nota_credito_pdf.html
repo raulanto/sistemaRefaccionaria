@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page {
+      size: 80mm 200mm;
+      margin: 3mm;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 8pt;
+      color: #000;
+    }
+    .centro { text-align: center; }
+    .negrita { font-weight: bold; }
+    .titulo {
+      font-size: 11pt;
+      font-weight: bold;
+    }
+    .linea {
+      border-top: 1px dashed #000;
+      margin: 6px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 7.5pt;
+      table-layout: fixed;
+    }
+    th {
+      border-bottom: 1px solid #000;
+      text-align: left;
+      padding: 2px 1px;
+    }
+    td {
+      padding: 3px 1px;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+    .col-concepto { width: 34%; }
+    .col-cant { width: 12%; text-align: center; }
+    .col-precio { width: 26%; text-align: right; }
+    .col-subtotal { width: 28%; text-align: right; }
+    .total-fila {
+      font-size: 10pt;
+      font-weight: bold;
+    }
+    .pie {
+      margin-top: 10px;
+      font-size: 7pt;
+      text-align: center;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="centro">
+    <div class="titulo">NOTA DE CRÉDITO</div>
+    <div>Refaccionaria</div>
+  </div>
+
+  <div class="linea"></div>
+
+  <div>
+    <span class="negrita">Cliente:</span> {{ cliente.nombre }}<br>
+    {% if cliente.telefono %}<span class="negrita">Tel:</span> {{ cliente.telefono }}<br>{% endif %}
+    <span class="negrita">Fecha:</span> {{ movimiento.fecha|date:"d/m/Y H:i" }}<br>
+    <span class="negrita">Folio:</span> #{{ movimiento.id }}<br>
+    <span class="negrita">Atendió:</span> {{ movimiento.usuario.get_full_name|default:movimiento.usuario.username|default:"—" }}
+  </div>
+
+  <div class="linea"></div>
+
+  {% if conceptos %}
+  <table>
+    <thead>
+      <tr>
+        <th class="col-concepto">Concepto</th>
+        <th class="col-cant">Cant.</th>
+        <th class="col-precio">P.U.</th>
+        <th class="col-subtotal">Subt.</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in conceptos %}
+      <tr>
+        <td class="col-concepto">{{ item.concepto }}</td>
+        <td class="col-cant">{{ item.cantidad }}</td>
+        <td class="col-precio">${{ item.precio|floatformat:2 }}</td>
+        <td class="col-subtotal">${{ item.subtotal|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div>{{ movimiento.concepto|default:"Sin detalle" }}</div>
+  {% endif %}
+
+  <div class="linea"></div>
+
+  <table>
+    <tr class="total-fila">
+      <td style="width:50%;">TOTAL</td>
+      <td style="width:50%; text-align:right;">${{ movimiento.monto|floatformat:2 }}</td>
+    </tr>
+  </table>
+
+  <div class="linea"></div>
+
+  <div class="pie">
+    Este documento es un comprobante de crédito.<br>
+    Consérvelo para su registro.
+  </div>
+
+</body>
+</html>

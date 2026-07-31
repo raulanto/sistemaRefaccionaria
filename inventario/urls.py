@@ -95,5 +95,6 @@ urlpatterns = [
     path('credito/clientes/<int:cliente_id>/pdf/', credito_Views.detalle_cliente_credito_pdf, name='detalle_cliente_credito_pdf'),
     path('credito/movimiento/<int:movimiento_id>/cancelar/', credito_Views.cancelar_movimiento_credito, name='cancelar_movimiento_credito'),
     path('eliminarCliente/<int:pk>/',views.EliminarClienteAjax,name='eliminarClienteAjax'),
+    path('credito/movimiento/<int:movimiento_id>/nota/', credito_Views.nota_movimiento_credito_pdf, name='nota_credito_pdf'),
 
 ]

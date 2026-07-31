@@ -44,19 +44,30 @@ class ClientesCreditoListView(View):
         })
 
     def post(self, request):
-        """Crear un cliente nuevo desde el modal propio."""
+        """Crea o edita un cliente, según si llega cliente_id."""
+        cliente_id = request.POST.get('cliente_id')
         nombre = request.POST.get('nombre')
         telefono = request.POST.get('telefono', '')
-        contacto = request.POST.get('contacto', '')
         notas = request.POST.get('notas', '')
 
-        if nombre:
+        if not nombre:
+            return redirect('inventario:clientes_credito_lista')
+
+        if cliente_id:
+            # Modo EDITAR
+            cliente = get_object_or_404(ClienteCredito, id=cliente_id)
+            cliente.nombre = nombre
+            cliente.telefono = telefono
+            cliente.notas = notas
+            cliente.save()
+        else:
+            # Modo CREAR
             ClienteCredito.objects.create(
-                nombre=nombre, telefono=telefono, contacto=contacto, notas=notas
+                nombre=nombre, telefono=telefono, notas=notas
             )
+
         return redirect('inventario:clientes_credito_lista')
-
-
+    
 class ClienteCreditoCrearView(View):
     """Página completa (sin modal) para dar de alta un cliente de crédito."""
     def get(self, request):
@@ -86,6 +97,7 @@ def registrar_movimiento_credito(request, cliente_id):
         tipo = data.get('tipo')
         monto = float(data.get('monto'))
         concepto = data.get('concepto', '')
+        productos = data.get('productos', [])
 
         if monto <= 0:
             return JsonResponse({'estado': 'error', 'mensaje': 'El monto debe ser mayor a cero.'})
@@ -94,6 +106,7 @@ def registrar_movimiento_credito(request, cliente_id):
             CreditoService.registrar_cargo(
                 cliente_id=cliente_id, monto=monto, concepto=concepto,
                 usuario=request.user if request.user.is_authenticated else None,
+                productos=productos,
             )
         elif tipo == 'ABONO':
             CreditoService.registrar_abono(
@@ -105,8 +118,8 @@ def registrar_movimiento_credito(request, cliente_id):
 
         return JsonResponse({'estado': 'ok'})
     except Exception as e:
-        return JsonResponse({'estado': 'error', 'mensaje': str(e)})    
-        
+        return JsonResponse({'estado': 'error', 'mensaje': str(e)})
+    
 def detalle_cliente_credito_pdf(request, cliente_id):
     """PDF con el historial completo de UN cliente de crédito."""
     cliente = get_object_or_404(ClienteCredito, id=cliente_id)
@@ -211,3 +224,22 @@ def EliminarClienteAjax(request, pk):
                     "mensaje": "No se puede eliminar porque el cliente ya tiene transacciones.",
                 }
             )
+
+def nota_movimiento_credito_pdf(request, movimiento_id):
+    movimiento = get_object_or_404(MovimientoCredito, id=movimiento_id)
+    conceptos = movimiento.productos_json or []
+
+    # Calculamos el subtotal de cada línea aquí, no en el template
+    for item in conceptos:
+        item['subtotal'] = float(item.get('cantidad', 0)) * float(item.get('precio', 0))
+
+    html = render_to_string('credito/nota_credito_pdf.html', {
+        'movimiento': movimiento,
+        'cliente': movimiento.cliente,
+        'conceptos': conceptos,
+    })
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="nota_{movimiento.id}.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response

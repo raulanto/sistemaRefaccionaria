@@ -33,7 +33,7 @@
           <thead class="table-light">
             <tr>
               <th>Cliente</th>
-              <th>Contacto</th>
+              <th>Telefono</th>
               <th class="text-end">Saldo (deuda)</th>
               <th></th>
             </tr>
@@ -43,17 +43,23 @@
             <tr id="fila-cliente-{{ item.cliente.id }}" data-nombre="{{ item.cliente.nombre|lower }}"
               data-contacto="{{ item.cliente.contacto|lower }}">
               <td>{{ item.cliente.nombre }}</td>
-              <td class="text-muted small">{{ item.cliente.contacto|default:"—" }} · {{ item.cliente.telefono|default:""}}</td>
+              <td class="text-muted small">{{ item.cliente.telefono|default:""}}</td>
               <td class="text-end fw-bold {% if item.saldo > 0 %}text-danger{% else %}text-success{% endif %}">
                 ${{ item.saldo|intcomma }}
               </td>
               <td class="text-end">
                 <a href="{% url 'inventario:detalle_cliente_credito' item.cliente.id %}"
-                  class="btn btn-sm btn-outline-primary">
-                  Ver detalle
+                  class="btn btn-sm btn-outline-success">
+                  <i class="fas fa-eye"></i>Detalle
                 </a>
+                <button type="button" class="btn btn-sm btn-outline-primary"
+                  onclick="abrirModalClienteEditar('{{ item.cliente.id }}', '{{ item.cliente.nombre|escapejs }}', '{{ item.cliente.telefono|default:''|escapejs }}', '{{ item.cliente.notas|default:''|escapejs }}')">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
                 <button onclick="alertaEliminar('{{item.cliente.id}}','{{ item.cliente.nombre }}')"
-                  class="btn btn-danger btn-sm">Eliminar</button>
+                  class="btn btn-sm btn-danger">
+                  <i class="fas fa-trash"></i> Eliminar
+                </button>
               </td>
             </tr>
             {% empty %}
@@ -77,37 +83,48 @@
 <div id="overlayModalCliente" class="modal-overlay-propio" style="display:none;" onclick="cerrarModalCliente(event)">
   <div class="modal-caja-propia" onclick="event.stopPropagation()">
     <div class="modal-header-propio">
-      <h5 class="mb-0">Nuevo Cliente de Crédito</h5>
+      <h5 class="mb-0">
+        <i class="fas fa-user-circle text-danger"></i>
+        <span id="tituloModalCliente">Nuevo Cliente de Crédito</span>
+      </h5>
       <button type="button" class="btn-cerrar-propio" onclick="cerrarModalCliente()">&times;</button>
     </div>
-    <form method="POST" action="{% url 'inventario:clientes_credito_lista' %}">
+    <form method="POST" id="formCliente" action="{% url 'inventario:clientes_credito_lista' %}">
       {% csrf_token %}
+      <input type="hidden" name="cliente_id" id="clienteIdInput" value="">
       <div class="modal-body-propio">
+
         <div class="mb-3">
-          <label class="form-label">Nombre / Empresa</label>
-          <input type="text" name="nombre" class="form-control" required>
+          <label class="form-label">
+            <i class="fas fa-building text-muted"></i> Nombre / Empresa
+          </label>
+          <input type="text" name="nombre" id="inputNombreCliente" class="form-control" required>
         </div>
+
         <div class="mb-3">
-          <label class="form-label">Contacto</label>
-          <input type="text" name="contacto" class="form-control">
+          <label class="form-label">
+            <i class="fas fa-phone text-muted"></i> Teléfono
+          </label>
+          <input type="text" name="telefono" id="inputTelefonoCliente" class="form-control">
         </div>
-        <div class="mb-3">
-          <label class="form-label">Teléfono</label>
-          <input type="text" name="telefono" class="form-control">
+
+        <div class="mb-0">
+          <label class="form-label">
+            <i class="fas fa-sticky-note text-muted"></i> Notas
+          </label>
+          <textarea name="notas" id="inputNotasCliente" class="form-control" rows="2"></textarea>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Notas</label>
-          <textarea name="notas" class="form-control" rows="2"></textarea>
-        </div>
+
       </div>
       <div class="modal-footer-propio">
         <button type="button" class="btn btn-secondary" onclick="cerrarModalCliente()">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-save"></i> <span id="btnGuardarTexto">Guardar</span>
+        </button>
       </div>
     </form>
   </div>
 </div>
-
 <style>
   .modal-overlay-propio {
     position: fixed;
@@ -124,11 +141,12 @@
 
   .modal-caja-propia {
     background: #fff;
-    border-radius: 10px;
+    border-radius: .6rem;
     width: 100%;
     max-width: 480px;
     margin: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+    overflow: hidden;
   }
 
   .modal-header-propio {
@@ -136,7 +154,16 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #eef0f2;
+  }
+
+  .modal-header-propio h5 {
+    color: #c0392b;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
   }
 
   .btn-cerrar-propio {
@@ -144,17 +171,39 @@
     border: none;
     font-size: 1.5rem;
     line-height: 1;
-    color: #666;
+    color: #999;
     cursor: pointer;
+    transition: color .15s;
+  }
+
+  .btn-cerrar-propio:hover {
+    color: #c0392b;
   }
 
   .modal-body-propio {
     padding: 20px;
   }
 
+  .modal-body-propio label.form-label {
+    font-size: .8rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .modal-body-propio .form-control {
+    font-size: .875rem;
+    border: 1px solid #dde1e6;
+  }
+
+  .modal-body-propio .form-control:focus {
+    border-color: #c0392b;
+    box-shadow: 0 0 0 .12rem rgba(192, 57, 43, .12);
+  }
+
   .modal-footer-propio {
     padding: 12px 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #eef0f2;
+    background: #f9fafb;
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -168,6 +217,24 @@
 
 <script>
   function abrirModalCliente() {
+    // Modo CREAR: limpia el formulario
+    document.getElementById('tituloModalCliente').textContent = 'Nuevo Cliente de Crédito';
+    document.getElementById('btnGuardarTexto').textContent = 'Guardar';
+    document.getElementById('clienteIdInput').value = '';
+    document.getElementById('inputNombreCliente').value = '';
+    document.getElementById('inputTelefonoCliente').value = '';
+    document.getElementById('inputNotasCliente').value = '';
+    document.getElementById('overlayModalCliente').style.display = 'flex';
+  }
+
+  function abrirModalClienteEditar(id, nombre, telefono, notas) {
+    // Modo EDITAR: precarga los datos del cliente
+    document.getElementById('tituloModalCliente').textContent = 'Editar Cliente';
+    document.getElementById('btnGuardarTexto').textContent = 'Actualizar';
+    document.getElementById('clienteIdInput').value = id;
+    document.getElementById('inputNombreCliente').value = nombre || '';
+    document.getElementById('inputTelefonoCliente').value = telefono || '';
+    document.getElementById('inputNotasCliente').value = notas || '';
     document.getElementById('overlayModalCliente').style.display = 'flex';
   }
 
@@ -232,6 +299,6 @@
       }
     });
   }
-  
+
 </script>
 {% endblock %}

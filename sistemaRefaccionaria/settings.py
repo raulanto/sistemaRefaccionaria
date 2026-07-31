@@ -31,9 +31,9 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = ['.ngrok-free.dev', '.ngrok-free.app', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['.ngrok-free.dev', '.ngrok-free.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
