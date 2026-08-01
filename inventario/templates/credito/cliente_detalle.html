@@ -65,24 +65,20 @@
               <td class="text-center text-success">{{ m.abono|default:"—" }}</td>
               <td class="text-center fw-bold">${{ m.saldo }}</td>
               <td class="text-center">
-    {% if m.tipo == 'CARGO' %}
-    <a href="{% url 'inventario:nota_credito_pdf' m.id %}"
-       target="_blank"
-       class="btn btn-primary btn-sm me-1"
-       title="Imprimir nota">
-        <i class="fas fa-print"></i> Imprimir
-    </a>
-    {% endif %}
+                {% if m.tipo == 'CARGO' %}
+                <a href="{% url 'inventario:nota_credito_pdf' m.id %}" target="_blank"
+                  class="btn btn-primary btn-sm me-1" title="Imprimir nota">
+                  <i class="fas fa-print"></i> Imprimir
+                </a>
+                {% endif %}
 
-    {% if not m.cancelado %}
-    <button type="button"
-            class="btn btn-danger btn-sm"
-            onclick="cancelarMovimiento({{ m.id }})"
-            title="Cancelar movimiento">
-        <i class="fas fa-times-circle"></i> Cancelar
-    </button>
-    {% endif %}
-</td>
+                {% if not m.cancelado %}
+                <button type="button" class="btn btn-danger btn-sm" onclick="cancelarMovimiento({{ m.id }})"
+                  title="Cancelar movimiento">
+                  <i class="fas fa-times-circle"></i> Cancelar
+                </button>
+                {% endif %}
+              </td>
             </tr>
             {% empty %}
             <tr>
@@ -163,10 +159,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   let tipoActual = null;
+  let guardando = false;
   let contadorFilas = 0;
   const modal = new bootstrap.Modal(document.getElementById('modalMovimiento'));
 
   function abrirMovimiento(tipo) {
+    guardando = false; // 🔓 reinicia el candado cada vez que se abre el modal
     tipoActual = tipo;
     document.getElementById('tituloModalMovimiento').innerText =
       tipo === 'CARGO' ? 'Registrar envío (cargo)' : 'Registrar pago (abono)';
@@ -242,6 +240,8 @@
   }
 
   function guardarMovimiento() {
+    if (guardando) return; // 🔒 evita múltiples envíos
+
     if (tipoActual === 'ABONO') {
       const monto = parseFloat(document.getElementById('inputMontoAbono').value);
       const concepto = document.getElementById('inputConceptoAbono').value;
@@ -251,6 +251,7 @@
         return;
       }
 
+      guardando = true; // 🔒 activa el candado
       enviarMovimiento({ tipo: 'ABONO', monto: monto, concepto: concepto });
 
     } else {
@@ -264,6 +265,7 @@
       const total = recalcularTotal();
       const conceptoResumen = items.map(i => i.concepto).join(', ');
 
+      guardando = true; // 🔒 activa el candado
       enviarMovimiento({ tipo: 'CARGO', monto: total, concepto: conceptoResumen, productos: items });
     }
   }
@@ -276,12 +278,17 @@
     })
       .then((r) => r.json())
       .then((data) => {
+        guardando = false; // 🔓 libera el candado
         if (data.estado === 'ok') {
           modal.hide();
           Swal.fire('Listo', 'Movimiento registrado.', 'success').then(() => location.reload());
         } else {
           Swal.fire('Error', data.mensaje, 'error');
         }
+      })
+      .catch(() => {
+        guardando = false; // 🔓 libera el candado si falla la conexión
+        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
       });
   }
 
@@ -310,5 +317,18 @@
       }
     });
   }
+
+  // Enter en cualquier campo del modal = Guardar, PERO solo si el modal sigue abierto
+  document.getElementById('modalMovimiento').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    if (!this.classList.contains('show')) return; // 🔒 ignora Enter si el modal ya se cerró
+    e.preventDefault();
+    guardarMovimiento();
+  });
+
+  // Al cerrar el modal, quita el foco de cualquier input (evita Enter "fantasma")
+  document.getElementById('modalMovimiento').addEventListener('hidden.bs.modal', function () {
+    if (document.activeElement) document.activeElement.blur();
+  });
 </script>
 {% endblock %}

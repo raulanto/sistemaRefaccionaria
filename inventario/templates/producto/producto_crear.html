@@ -23,6 +23,11 @@
                 <!-- ========================= -->
                 <!-- INFORMACIÓN GENERAL -->
                 <!-- ========================= -->
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    {{ form.errors }}
+                </div>
+                {% endif %}
                 <div class="seccion">
                     <h5 class="seccion-titulo">Información General</h5>
                     <div class="row">
