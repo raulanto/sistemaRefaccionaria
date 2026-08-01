@@ -49,12 +49,14 @@ class CreditoService:
 
         if movimiento.cancelado:
             raise ValueError("Este movimiento ya estaba cancelado.")
-
+        
         if movimiento.tipo == 'CARGO' and movimiento.productos_json:
             for item in movimiento.productos_json:
-                producto = Producto.objects.select_for_update().get(id=item['producto_id'])
-                producto.stock += item['cantidad']
-                producto.save()
+                producto_id = item.get('producto_id')
+                if producto_id:
+                    producto = Producto.objects.select_for_update().get(id=producto_id)
+                    producto.stock += item.get('cantidad', 0)
+                    producto.save()
 
         movimiento.cancelado = True
         movimiento.save()
