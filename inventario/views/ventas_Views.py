@@ -14,6 +14,12 @@ from django.db.models import F, ProtectedError
 from django.views.generic import ListView
 from django.shortcuts import get_object_or_404
 
+import json
+from django.http import JsonResponse
+from django.db import transaction
+
+from inventario.models import Producto, Venta, DetalleVenta
+from inventario.services.credito_service import CreditoService
 
 def VentaView(request):
     productos = Producto.objects.all()
@@ -177,16 +183,10 @@ def buscar_productos_ajax(request):
             "nombre": p.nombre,
             "precio": float(p.precio_venta),
             "stock": p.stock,
-            "tiene_iva": p.tiene_iva,
+            'marca': p.marca.nombre,
         }
         for p in productos
     ]
     return JsonResponse({"productos": data})
 
 
-import json
-from django.http import JsonResponse
-from django.db import transaction
-
-from inventario.models import Producto, Venta, DetalleVenta
-from inventario.services.credito_service import CreditoService

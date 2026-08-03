@@ -1,4 +1,5 @@
 {% extends 'base/body.html' %}
+{% load humanize %}
 {% block headercontect %}
 {% include 'base/header/overlapHeader.html' %}
 {% endblock %}
@@ -25,7 +26,7 @@
           <div class="border rounded p-3 text-center">
             <div class="text-muted small">Saldo actual (te debe)</div>
             <div class="h3 {% if saldo_actual > 0 %}text-danger{% else %}text-success{% endif %}">
-              ${{ saldo_actual }}
+              ${{ saldo_actual|intcomma  }}
             </div>
           </div>
         </div>
@@ -61,9 +62,9 @@
                 {{ m.concepto|default:"—" }}
                 {% if m.cancelado %}<span class="badge bg-secondary ms-1">Cancelado</span>{% endif %}
               </td>
-              <td class="text-center text-danger">{{ m.cargo|default:"—" }}</td>
-              <td class="text-center text-success">{{ m.abono|default:"—" }}</td>
-              <td class="text-center fw-bold">${{ m.saldo }}</td>
+              <td class="text-center text-danger">{{ m.cargo|default:"—"|intcomma  }}</td>
+              <td class="text-center text-success">{{ m.abono|default:"—"|intcomma  }}</td>
+              <td class="text-center fw-bold">${{ m.saldo|intcomma  }}</td>
               <td class="text-center">
                 {% if m.tipo == 'CARGO' %}
                 <a href="{% url 'inventario:nota_credito_pdf' m.id %}" target="_blank"

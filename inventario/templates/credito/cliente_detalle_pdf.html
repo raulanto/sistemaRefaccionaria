@@ -2,6 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
+{% load humanize %}
+
 <style>
     body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #222; }
     h1 { font-size: 18px; margin-bottom: 2px; }
@@ -28,7 +30,9 @@
     <table class="resumen">
         <tr>
             <td><strong>Saldo actual (te debe):</strong></td>
-            <td>${{ saldo_actual }}</td>
+            <td class="fw-bold text-dark" style="font-size: 16px; font-weight: 800;">
+                ${{ saldo_actual|intcomma }}
+            </td>
             <td style="padding-left:30px;"><strong>Generado:</strong></td>
             <td>{{ fecha_generacion|date:"d/m/Y H:i" }}</td>
         </tr>
@@ -49,9 +53,9 @@
             <tr>
                 <td>{{ m.fecha|date:"d/m/Y H:i" }}</td>
                 <td>{{ m.concepto|default:"—" }}</td>
-                <td class="center cargo">{{ m.cargo|default:"—" }}</td>
-                <td class="center abono">{{ m.abono|default:"—" }}</td>
-                <td class="center"><strong>${{ m.saldo }}</strong></td>
+                <td class="center cargo">{{ m.cargo|default:"—"|intcomma  }}</td>
+                <td class="center abono">{{ m.abono|default:"—"|intcomma  }}</td>
+                <td class="center"><strong>${{ m.saldo|intcomma  }}</strong></td>
             </tr>
             {% empty %}
             <tr>

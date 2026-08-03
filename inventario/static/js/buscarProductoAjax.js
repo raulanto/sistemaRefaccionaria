@@ -107,6 +107,7 @@ const BuscadorProducto = (function () {
             <div>
               <span class="badge bg-light text-dark border me-2">${p.codigo}</span>
               <strong>${p.nombre}</strong>
+              ${p.marca ? '<span class="badge bg-secondary-subtle text-black ms-1">' + p.marca + '</span>' : ''}
             </div>
             <div class="text-end">
               <div class="small ${sinStock ? 'text-danger' : 'text-muted'}">

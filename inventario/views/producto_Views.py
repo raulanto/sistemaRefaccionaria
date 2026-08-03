@@ -152,7 +152,7 @@ def buscar_productos_ajax(request):
     """
     q = request.GET.get('q', '').strip()
 
-    productos = Producto.objects.all()
+    productos = Producto.objects.select_related('marca').all()
 
     if q:
         productos = productos.filter(
@@ -168,7 +168,7 @@ def buscar_productos_ajax(request):
             'nombre': p.nombre,
             'precio': float(p.precio_venta),
             'stock': p.stock,
-            'tiene_iva': p.tiene_iva,
+            'marca': p.marca.nombre,
         }
         for p in productos
     ]
