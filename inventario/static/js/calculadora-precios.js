@@ -3,7 +3,7 @@
    Las listas `categorias` y `marcas` se definen en el template
    (necesitan datos de Django), este archivo solo las consume.
    =========================================================== */
-function buscarYSeleccionar(input, selectId, lista) {
+function buscarYSeleccionarLista(input, selectId, lista) {
     const encontrado = lista.find(item => item.nombre === input.value.trim());
     document.getElementById(selectId).value = encontrado ? encontrado.id : '';
     input.classList.toggle('is-invalid', !encontrado);
