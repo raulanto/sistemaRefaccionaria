@@ -31,7 +31,7 @@ class CierreCajaListView(View):
             'fecha_inicio': fecha_inicio,
             'fecha_fin': fecha_fin,
         }
-        return render(request, 'cierreCaja/cierreCajalista.html', data)
+        return render(request, 'cierreCaja/cierreCajaLista.html', data)
 
 
 def cerrar_caja(request):
