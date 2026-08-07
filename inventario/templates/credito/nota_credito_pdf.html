@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <style>
-    @page {
-      size: 80mm 200mm;
+      @page {
+      size: 80mm {{ altura_mm }}mm;
       margin: 3mm;
     }
     body {
@@ -58,7 +58,7 @@
 
   <div class="centro">
     <div class="titulo">NOTA DE CRÉDITO</div>
-    <div>Refaccionaria</div>
+    <h1>REFACCIONARIA M&V</h1>
   </div>
 
   <div class="linea"></div>
@@ -86,7 +86,7 @@
     <tbody>
       {% for item in conceptos %}
       <tr>
-        <td class="col-concepto">{{ item.concepto }}</td>
+        <td class="col-concepto">{{ item.concepto|truncatechars:26 }}</td>
         <td class="col-cant">{{ item.cantidad }}</td>
         <td class="col-precio">${{ item.precio|floatformat:2 }}</td>
         <td class="col-subtotal">${{ item.subtotal|floatformat:2 }}</td>

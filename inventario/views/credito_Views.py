@@ -224,19 +224,25 @@ def EliminarClienteAjax(request, pk):
                     "mensaje": "No se puede eliminar porque el cliente ya tiene transacciones.",
                 }
             )
-
+            
 def nota_movimiento_credito_pdf(request, movimiento_id):
     movimiento = get_object_or_404(MovimientoCredito, id=movimiento_id)
     conceptos = movimiento.productos_json or []
 
-    # Calculamos el subtotal de cada línea aquí, no en el template
     for item in conceptos:
         item['subtotal'] = float(item.get('cantidad', 0)) * float(item.get('precio', 0))
+
+    # Calcula el alto del ticket según cuántas líneas de concepto tenga
+    altura_base_mm = 60  # encabezado + folio + total + pie de página
+    altura_por_concepto_mm = 7  # cada línea de concepto ocupa aprox esto
+    altura_mm = altura_base_mm + (len(conceptos) * altura_por_concepto_mm)
+    altura_mm = max(altura_mm, 80)  # nunca menos de 80mm, por si acaso
 
     html = render_to_string('credito/nota_credito_pdf.html', {
         'movimiento': movimiento,
         'cliente': movimiento.cliente,
         'conceptos': conceptos,
+        'altura_mm': altura_mm,
     })
 
     response = HttpResponse(content_type='application/pdf')
