@@ -37,6 +37,9 @@ class LoginRequeridoMiddleware:
             '/credito/cliente_detalle/',
             '/credito/clientes/',
             '/credito/movimiento/',
+            '/credito/cliente/',
+            
+
         ],
         'Oficina': [
             '/dashboard/dashboard/',
