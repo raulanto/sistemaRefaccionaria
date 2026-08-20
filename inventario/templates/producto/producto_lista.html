@@ -10,7 +10,7 @@
       <a class="btn btn-primary btn-sm me-2" href="{% url 'inventario:productoCrear' %}">
         Nuevo Producto
       </a>
-      <a class="btn btn-success btn-sm" href="{% url 'inventario:exportarProductosExcel' %}">
+      <a class="btn btn-success btn-sm" id="btnExportarExcel" href="{% url 'inventario:exportarProductosExcel' %}">
         <i class="fas fa-file-excel"> </i>Exportar a Excel
       </a>
     </div>
@@ -23,12 +23,11 @@
               <th>CODIGO</th>
               <th>NOMBRE</th>
               <th>MARCA</th>
+              <th>STOCK</th>
               <th>PRECIO COMPRA</th>
               <th>PRECIO VENTA</th>
               <th>PRECIO MAYOREO</th>
               <th>CANTIDAD MAYOREO</th>
-              <th>CANTIDAD PRODUCTO</th>
-              <th>ESTADO</th>
               <th>CATEGORIA</th>
               <th>ACCIONES</th>
             </tr>
@@ -36,14 +35,13 @@
           <tfoot>
             <tr>
               <th>CODIGO</th>
-              <th>Nombre</th>
+              <th>NOMBRE</th>
               <th>MARCA</th>
+              <th>STOCK</th>
               <th>PRECIO COMPRA</th>
               <th>PRECIO VENTA</th>
               <th>PRECIO MAYOREO</th>
               <th>CANTIDAD MAYOREO</th>
-              <th>CANTIDAD PRODUCTO</th>
-              <th>ESTADO</th>
               <th>CATEGORIA</th>
               <th>ACCIONES</th>
             </tr>
@@ -54,23 +52,16 @@
               <td>{{ producto.codigo }}</td>
               <td>{{ producto.nombre }}</td>
               <td>{{ producto.marca }}</td>
+              <td>
+                <span
+                  class="badge {% if producto.estado == 'Disponible' %}badge-success {% elif producto.estado == 'Proximo Agotarse' %}badge-warning {% else %}badge-danger {% endif %}">
+                 {{ producto.stock }} / {{ producto.estado }}
+                </span>
+              </td>
               <td>{{ producto.precio_compra }}</td>
               <td>{{ producto.precio_venta }}</td>
               <td>{{ producto.precio_mayoreo }}</td>
               <td>{{ producto.cantidad_mayoreo }}</td>
-              <td>
-                {% if producto.stock > 0 %}
-                <span class="badge badge-success">{{ producto.stock }}</span>
-                {% else %}
-                <span class="badge badge-danger">Agotado</span>
-                {% endif %}
-              </td>
-              <td>
-                <span
-                  class="badge {% if producto.estado == 'Disponible' %}badge-success {% elif producto.estado == 'Proximo Agotarse' %}badge-warning {% else %}badge-danger {% endif %}">
-                  {{producto.estado }}
-                </span>
-                </td>
               <td>{{ producto.categoria }}</td>
               <td class="text-nowrap">
                 <a class="btn btn-success btn-sm" href="{% url 'inventario:productoDetalle' producto.id %}">Detalle</a>
@@ -86,22 +77,34 @@
   </div>
 </div>
 {% endblock %} {% block script %}
-<script>
-  // Call the dataTables jQuery plugin
-  $(document).ready(function () {
-    $("#dataTable").DataTable();
-  });
-
-  $(document).ready(function () {
-    $("#dataTableActivity").DataTable({
-      order: [[0, "desc"]],
-    });
-  });
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
+$(document).ready(function () {
+  const tabla = $("#dataTable").DataTable({
+    language: {
+      search: "Buscar:",
+      lengthMenu: "Mostrar _MENU_ registros",
+      info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+      infoEmpty: "Mostrando 0 a 0 de 0 registros",
+      infoFiltered: "(filtrado de _MAX_ registros totales)",
+      paginate: {
+        first: "Primero",
+        last: "Último",
+        next: "Siguiente",
+        previous: "Anterior"
+      },
+      zeroRecords: "No se encontraron resultados",
+      emptyTable: "No hay datos disponibles"
+    }
+  });
+
+  const urlBaseExportar = $("#btnExportarExcel").attr("href");
+  tabla.on("search.dt", function () {
+    const busqueda = tabla.search();
+    $("#btnExportarExcel").attr("href", urlBaseExportar + "?q=" + encodeURIComponent(busqueda));
+  });
+});
+
   function alertaEliminar(id) {
     Swal.fire({
       title: "¿Estas seguro de eliminar este producto?",
@@ -139,5 +142,6 @@
       }
     });
   }
+
 </script>
 {% endblock %}

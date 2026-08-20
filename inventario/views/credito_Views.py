@@ -249,3 +249,53 @@ def nota_movimiento_credito_pdf(request, movimiento_id):
     response['Content-Disposition'] = f'inline; filename="nota_{movimiento.id}.pdf"'
     pisa.CreatePDF(html, dest=response)
     return response
+
+def corte_saldo_cliente_pdf(request, cliente_id):   
+    """PDF tipo 'corte': solo los conceptos que aún no se han pagado."""
+    cliente = get_object_or_404(ClienteCredito, id=cliente_id)
+    lineas_pendientes = CreditoService.lineas_pendientes(cliente)
+    saldo_actual = CreditoService.calcular_saldo(cliente)
+
+    html = render_to_string('credito/corte_saldo_pdf.html', {
+        'cliente': cliente,
+        'lineas': lineas_pendientes,
+        'saldo_actual': saldo_actual,
+        'fecha_generacion': django_timezone.localtime(),
+    })
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="corte_{cliente.nombre}.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response
+
+def obtener_movimiento_credito(request, movimiento_id):
+    """Devuelve los datos de un movimiento de crédito en formato JSON."""
+    movimiento = get_object_or_404(MovimientoCredito, id=movimiento_id)
+    data = {
+        'id': movimiento.id,
+        'tipo': movimiento.tipo,
+        'monto': float(movimiento.monto),
+        'concepto': movimiento.concepto or '',
+        'fecha': movimiento.fecha.strftime('%Y-%m-%d %H:%M:%S'),
+        'cancelado': movimiento.cancelado,
+        'productos': movimiento.productos_json or [],
+    }
+    return JsonResponse({'estado': 'ok', 'movimiento': data})
+
+def editar_movimiento_credito(request, movimiento_id):
+    if request.method != "POST":
+        return JsonResponse({'estado': 'error', 'mensaje': 'Método no permitido'})
+    
+    try:
+        data = json.loads(request.body)
+        monto = float(data.get('monto'))
+        concepto = data.get('concepto', '')
+        productos = data.get('productos', [])
+
+        if monto <= 0:
+            return JsonResponse({'estado': 'error', 'mensaje': 'El monto debe ser mayor a cero.'})
+
+        CreditoService.editar_cargo(movimiento_id, monto, concepto, productos)
+        return JsonResponse({'estado': 'ok'})
+    except Exception as e:
+        return JsonResponse({'estado': 'error', 'mensaje': str(e)})

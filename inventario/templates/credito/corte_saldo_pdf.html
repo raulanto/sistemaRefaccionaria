@@ -16,19 +16,20 @@
     th, td { border: 1px solid #ccc; padding: 3px 5px; text-align: left; line-height: 1.25; }
     th { background: #f0f0f0; font-size: 9px; }
     .center { text-align: center; }
-    .cargo { color: #b91c1c; font-weight: bold; }
-    .abono { color: #1f9d55; font-weight: bold; }
+    .right { text-align: right; }
+    .pendiente { color: #b91c1c; font-weight: bold; }
     .resumen { margin: 6px 0 10px; }
     .resumen td { border: none; padding: 1px 10px 1px 0; }
     .footer { margin-top: 10px; color: #888; font-size: 8px; }
+    .total-row td { border-top: 2px solid #333; font-weight: bold; background: #f7f7f7; }
 </style>
 </head>
 <body>
 
-    <h1>Estado de Cuenta de Crédito</h1>
+    <h1>Saldo Pendiente</h1>
     <div class="subtitulo">
         {{ cliente.nombre }}
-        {% if cliente.contacto %} — {{ cliente.contacto }}{% endif %}
+        {% if cliente.telefono %} — {{ cliente.telefono }}{% endif %}
     </div>
 
     <table class="resumen">
@@ -44,44 +45,44 @@
 
     <table>
         <colgroup>
-            <col width="15%">
-            <col width="35%">
-            <col width="16.5%">
-            <col width="16.5%">
-            <col width="17%">
+            <col width="18%">
+            <col width="37%">
+            <col width="13%">
+            <col width="16%">
+            <col width="16%">
         </colgroup>
         <thead>
             <tr>
                 <th>Fecha</th>
                 <th>Concepto</th>
-                <th class="center">Cargo</th>
-                <th class="center">Abono</th>
-                <th class="center">Saldo</th>
+                <th class="center">Cantidad</th>
+                <th class="right">Precio unitario</th>
+                <th class="right">Pendiente</th>
             </tr>
         </thead>
         <tbody>
-            {% for m in movimientos %}
+            {% for linea in lineas %}
             <tr>
-                <td>{{ m.fecha|date:"d/m/Y H:i" }}</td>
-                <td>
-                    {% if m.productos %}
-                        {% for item in m.productos %}
-                            {{ item.concepto }}{% if not forloop.last %}<br/>{% endif %}
-                        {% endfor %}
-                    {% else %}
-                        {{ m.concepto|default:"—" }}
-                    {% endif %}
-                </td>
-                <td class="center cargo">{{ m.cargo|default:"—"|intcomma  }}</td>
-                <td class="center abono">{{ m.abono|default:"—"|intcomma  }}</td>
-                <td class="center"><strong>${{ m.saldo|intcomma  }}</strong></td>
+                <td>{{ linea.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ linea.concepto }}</td>
+                <td class="center">{{ linea.cantidad|floatformat:0 }}</td>
+                <td class="right">${{ linea.precio|floatformat:2|intcomma }}</td>
+                <td class="right pendiente">${{ linea.pendiente|floatformat:2|intcomma }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="center">Sin movimientos registrados.</td>
+                <td colspan="5" class="center">Sin conceptos pendientes.</td>
             </tr>
             {% endfor %}
         </tbody>
+        {% if lineas %}
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="4" class="right">Total pendiente</td>
+                <td class="right">${{ saldo_actual|floatformat:2|intcomma }}</td>
+            </tr>
+        </tfoot>
+        {% endif %}
     </table>
 
     <div class="footer">

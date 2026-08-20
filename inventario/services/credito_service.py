@@ -73,11 +73,13 @@ class CreditoService:
                 saldo += m.monto if m.tipo == 'CARGO' else -m.monto
             resultado.append({
                 'id': m.id,
-                'fecha': m.fecha, 'tipo': m.tipo, 'concepto': m.concepto,
+                'fecha': m.fecha, 'tipo': m.tipo, 'concepto': m.concepto.replace('', '\n') if m.concepto else '',
                 'cargo': m.monto if m.tipo == 'CARGO' else None,
                 'abono': m.monto if m.tipo == 'ABONO' else None,
                 'saldo': saldo, 'usuario': m.usuario,
                 'cancelado': m.cancelado,
+                'productos': m.productos_json,   # 👈 agregar esta línea en ambas funciones
+
                 
             })
         return resultado
@@ -113,10 +115,12 @@ class CreditoService:
             if not m.cancelado:
                 saldo += m.monto if m.tipo == 'CARGO' else -m.monto
             resultado.append({
-                'id': m.id, 'fecha': m.fecha, 'tipo': m.tipo, 'concepto': m.concepto,
+                'id': m.id, 'fecha': m.fecha, 'tipo': m.tipo, 'concepto': m.concepto.replace('', '\n') if m.concepto else '',
                 'cargo': m.monto if m.tipo == 'CARGO' else None,
                 'abono': m.monto if m.tipo == 'ABONO' else None,
                 'saldo': saldo, 'cancelado': m.cancelado,
+                'productos': m.productos_json,   # 👈 agregar esta línea en ambas funciones
+
             })
 
         return {'saldo_inicial': saldo_inicial, 'movimientos': resultado, 'saldo_final': saldo}
@@ -127,3 +131,78 @@ class CreditoService:
         for cliente in ClienteCredito.objects.filter(activo=True):
             total += CreditoService.calcular_saldo(cliente)
         return total
+    
+    @staticmethod
+    def lineas_pendientes(cliente):
+        """
+        Devuelve la lista de conceptos que aún no se han cubierto, aplicando
+        los abonos contra los cargos más antiguos primero (FIFO).
+        Si un cargo se paga parcialmente, se muestra con su monto restante.
+        """
+        movimientos = MovimientoCredito.objects.filter(
+            cliente=cliente, cancelado=False
+        ).order_by('fecha')
+
+        lineas = []
+        total_abonos = 0
+
+        for m in movimientos:
+            if m.tipo == 'ABONO':
+                total_abonos += float(m.monto)
+                continue
+
+            # CARGO: si tiene detalle de productos, una línea por cada concepto;
+            # si no, una sola línea usando el concepto/monto del movimiento.
+            if m.productos_json:
+                for item in m.productos_json:
+                    cantidad = float(item.get('cantidad', 1))
+                    precio = float(item.get('precio', 0))
+                    subtotal = item.get('subtotal', cantidad * precio)
+                    lineas.append({
+                        'fecha': m.fecha,
+                        'concepto': item.get('concepto', '—'),
+                        'cantidad': cantidad,
+                        'precio': precio,
+                        'subtotal': float(subtotal),
+                        'pendiente': float(subtotal),
+                    })
+            else:
+                lineas.append({
+                    'fecha': m.fecha,
+                    'concepto': m.concepto or '—',
+                    'cantidad': 1,
+                    'precio': float(m.monto),
+                    'subtotal': float(m.monto),
+                    'pendiente': float(m.monto),
+                })
+
+        # Aplica los abonos contra las líneas más antiguas primero
+        restante = total_abonos
+        for linea in lineas:
+            if restante <= 0:
+                break
+            aplicado = min(restante, linea['pendiente'])
+            linea['pendiente'] -= aplicado
+            restante -= aplicado
+
+        # Solo devolvemos lo que sigue sin cubrirse
+        pendientes = [l for l in lineas if l['pendiente'] > 0.009]
+        return pendientes
+    
+    
+    @staticmethod
+    @transaction.atomic
+    def editar_cargo(movimiento_id, monto, concepto='', producto=None):
+        """ Edita un cargo existente (conceptos y montos). No permite editar cargos cancelados"""
+        movimiento = MovimientoCredito.objects.select_for_update().get(id=movimiento_id)
+        
+        if movimiento.cancelado:
+            raise ValueError("No se puede editar un cargo cancelado.")
+        if movimiento.tipo != 'CARGO':
+            raise ValueError("Solo se pueden editar cargos.")
+        
+        movimiento.monto = monto
+        movimiento.concepto = concepto
+        movimiento.productos_json = producto or []
+        movimiento.save()
+        return movimiento

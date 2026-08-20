@@ -95,45 +95,44 @@ def EliminarProductoAjax(request, pk):
                 }
             )
 
-
 def ExportarProdutosExcel(request):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Productos"
 
-    # Encabezados
     encabezados = [
-        "Código", "Nombre", "Categoría", "Marca", "Proveedor",
-        "Precio Compra", "Precio Venta", "Stock", "Stock Mínimo", "Estado"
+        "Código", "Nombre", "Marca", "Stock", "Estado", "Precio Compra", "Precio Venta"
     ]
     ws.append(encabezados)
 
-    # Estilo del encabezado
     for col_num, _ in enumerate(encabezados, 1):
         celda = ws.cell(row=1, column=col_num)
         celda.font = Font(bold=True, color="FFFFFF")
         celda.fill = PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid")
 
-    # Datos
+    # Filtra según lo que se esté buscando en la tabla
+    q = request.GET.get('q', '').strip()
     productos = Producto.objects.select_related(
         "categoria", "marca", "proveedor_principal"
     ).all()
+
+    if q:
+        productos = productos.filter(
+            Q(codigo__icontains=q) | Q(nombre__icontains=q) |
+            Q(marca__nombre__icontains=q) | Q(categoria__nombre__icontains=q)
+        )
 
     for p in productos:
         ws.append([
             p.codigo,
             p.nombre,
-            p.categoria.nombre,
             p.marca.nombre,
-            p.proveedor_principal.nombre,
+            p.stock,
+            p.estado,
             float(p.precio_compra),
             float(p.precio_venta),
-            p.stock,
-            p.stock_minimo,
-            p.estado,
         ])
 
-    # Ajustar ancho de columnas automáticamente
     for col in ws.columns:
         max_len = max(len(str(c.value)) for c in col if c.value is not None)
         ws.column_dimensions[col[0].column_letter].width = max_len + 3
@@ -173,3 +172,16 @@ def buscar_productos_ajax(request):
         for p in productos
     ]
     return JsonResponse({'productos': data})
+
+
+class AlertasStockView(View):
+    def get(self, request):
+        productos = Producto.objects.select_related('marca').filter(
+            estado__in=['Agotado', 'Proximo Agotarse']
+        ).order_by('estado', 'nombre')
+
+        data = {
+            "titulo": "Alertas de Stock",
+            "productos": productos,
+        }
+        return render(request, "producto/alertas_stock.html", context=data)

@@ -23,6 +23,7 @@ urlpatterns = [
     path('eliminarProducto/<int:pk>/',producto_Views.EliminarProductoAjax,name='eliminarProductoAjax'),
     path('productos/exportar/', producto_Views.ExportarProdutosExcel, name='exportarProductosExcel'),
     path('productos/buscar_ajax/', views.buscar_productos_ajax, name='buscar_productos_ajax'),
+    path('producto/alertas_stock/', producto_Views.AlertasStockView.as_view(), name='alertasStock'),
 
     
     #PROVEEDOR EMPRESA
@@ -96,5 +97,8 @@ urlpatterns = [
     path('credito/movimiento/<int:movimiento_id>/cancelar/', credito_Views.cancelar_movimiento_credito, name='cancelar_movimiento_credito'),
     path('eliminarCliente/<int:pk>/',views.EliminarClienteAjax,name='eliminarClienteAjax'),
     path('credito/movimiento/<int:movimiento_id>/nota/', credito_Views.nota_movimiento_credito_pdf, name='nota_credito_pdf'),
+    path('credito/cliente/<int:cliente_id>/corte/', credito_Views.corte_saldo_cliente_pdf, name='corte_saldo_cliente_pdf'),
+    path('credito/movimiento/<int:movimiento_id>/editar/', credito_Views.editar_movimiento_credito, name='editar_movimiento_credito'),
+    path('credito/movimiento/<int:movimiento_id>/obtener/', credito_Views.obtener_movimiento_credito, name='obtener_movimiento_credito'),
 
 ]

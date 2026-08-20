@@ -1,0 +1,90 @@
+{% extends 'base/body.html' %} {% block headercontect %}
+    {% include 'base/header/overlapHeader.html' %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-n10">
+  <div class="card card-header-actions">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="fas fa-exclamation-triangle text-warning"></i> Alertas de Stock</span>
+      <div>
+        <button type="button" class="btn btn-sm btn-outline-secondary filtro-estado active" data-filtro="todos">Todos</button>
+        <button type="button" class="btn btn-sm btn-outline-danger filtro-estado" data-filtro="Agotado">Agotados</button>
+        <button type="button" class="btn btn-sm btn-outline-warning filtro-estado" data-filtro="Proximo Agotarse">Próximos a agotarse</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="dataTableAlertas">
+          <thead>
+            <tr>
+              <th>CODIGO</th>
+              <th>NOMBRE</th>
+              <th>MARCA</th>
+              <th>STOCK</th>
+              <th>STOCK MINIMO</th>
+              <th>ESTADO</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for producto in productos %}
+            <tr class="fila-alerta" data-estado="{{ producto.estado }}">
+              <td>{{ producto.codigo }}</td>
+              <td>{{ producto.nombre }}</td>
+              <td>{{ producto.marca }}</td>
+              <td>{{ producto.stock }}</td>
+              <td>{{ producto.stock_minimo }}</td>
+              <td>
+                <span class="badge {% if producto.estado == 'Agotado' %}badge-danger{% else %}badge-warning{% endif %}">
+                  {{ producto.estado }}
+                </span>
+              </td>
+              <td class="text-nowrap">
+                <a class="btn btn-primary btn-sm" href="{% url 'inventario:editarProducto' producto.id %}">Editar</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                <i class="fas fa-check-circle text-success"></i> No hay productos agotados ni próximos a agotarse.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  $(document).ready(function () {
+    const tabla = $("#dataTableAlertas").DataTable({
+      language: {
+        search: "Buscar:",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Mostrando 0 a 0 de 0 registros",
+        infoFiltered: "(filtrado de _MAX_ registros totales)",
+        paginate: { first: "Primero", last: "Último", next: "Siguiente", previous: "Anterior" },
+        zeroRecords: "No se encontraron resultados",
+        emptyTable: "No hay datos disponibles"
+      }
+    });
+
+    $(".filtro-estado").on("click", function () {
+      $(".filtro-estado").removeClass("active");
+      $(this).addClass("active");
+      const filtro = $(this).data("filtro");
+
+      if (filtro === "todos") {
+        tabla.column(5).search("").draw();
+      } else {
+        tabla.column(5).search(filtro).draw();
+      }
+    });
+  });
+</script>
+{% endblock %}
