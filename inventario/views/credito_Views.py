@@ -12,6 +12,8 @@ from inventario.services.credito_service import CreditoService
 from xhtml2pdf import pisa
 from datetime import datetime
 from django.db.models import ProtectedError
+from django.contrib import messages
+
 
 
 
@@ -25,6 +27,8 @@ def buscar_clientes_credito_ajax(request):
 
     data = [{'id': c.id, 'nombre': c.nombre, 'contacto': c.contacto} for c in clientes]
     return JsonResponse({'clientes': data})
+
+
 
 
 class ClientesCreditoListView(View):
@@ -46,11 +50,21 @@ class ClientesCreditoListView(View):
     def post(self, request):
         """Crea o edita un cliente, según si llega cliente_id."""
         cliente_id = request.POST.get('cliente_id')
-        nombre = request.POST.get('nombre')
+        nombre = request.POST.get('nombre', '').strip()
         telefono = request.POST.get('telefono', '')
         notas = request.POST.get('notas', '')
 
         if not nombre:
+            messages.error(request, 'El nombre es obligatorio.')
+            return redirect('inventario:clientes_credito_lista')
+
+        # Verifica si ya existe otro cliente con ese nombre (excluyendo el actual si es edición)
+        existe = ClienteCredito.objects.filter(nombre__iexact=nombre)
+        if cliente_id:
+            existe = existe.exclude(id=cliente_id)
+
+        if existe.exists():
+            messages.error(request, f'Ya existe un cliente registrado con el nombre "{nombre}".')
             return redirect('inventario:clientes_credito_lista')
 
         if cliente_id:
@@ -67,26 +81,6 @@ class ClientesCreditoListView(View):
             )
 
         return redirect('inventario:clientes_credito_lista')
-    
-class ClienteCreditoCrearView(View):
-    """Página completa (sin modal) para dar de alta un cliente de crédito."""
-    def get(self, request):
-        return render(request, 'credito/cliente_crear.html', {
-            'titulo': 'Nuevo Cliente de Crédito',
-        })
-
-    def post(self, request):
-        nombre = request.POST.get('nombre')
-        telefono = request.POST.get('telefono', '')
-        contacto = request.POST.get('contacto', '')
-        notas = request.POST.get('notas', '')
-
-        if nombre:
-            ClienteCredito.objects.create(
-                nombre=nombre, telefono=telefono, contacto=contacto, notas=notas
-            )
-        return redirect('inventario:clientes_credito_lista')
-
 
 def registrar_movimiento_credito(request, cliente_id):
     if request.method != "POST":
@@ -178,36 +172,8 @@ class DetalleClienteCreditoView(View):
             'fecha_inicio': fecha_inicio_str,
             'fecha_fin': fecha_fin_str,
         })
-class ClienteCreditoEditarView(View):
-    """Editar los datos de un cliente de crédito."""
-    def get(self, request, cliente_id):
-        cliente = get_object_or_404(ClienteCredito, id=cliente_id)
-        return render(request, 'credito/cliente_editar.html', {
-            'titulo': 'Editar Cliente',
-            'cliente': cliente,
-        })
-
-    def post(self, request, cliente_id):
-        cliente = get_object_or_404(ClienteCredito, id=cliente_id)
-        cliente.nombre = request.POST.get('nombre')
-        cliente.telefono = request.POST.get('telefono', '')
-        cliente.contacto = request.POST.get('contacto', '')
-        cliente.notas = request.POST.get('notas', '')
-        cliente.save()
-        return redirect('inventario:detalle_cliente_credito', cliente_id=cliente.id)
-
         
-@staticmethod
-def registrar_cargo(cliente_id, monto, concepto='', usuario=None, items=None):
-    """
-    items: lista de dicts [{concepto, cantidad, precio}, ...] — conceptos libres,
-    no necesariamente productos reales del inventario.
-    """
-    cliente = ClienteCredito.objects.get(id=cliente_id)
-    return MovimientoCredito.objects.create(
-        cliente=cliente, tipo='CARGO', monto=monto, concepto=concepto, usuario=usuario,
-        productos_json=items or [],
-    )
+     
 
 def EliminarClienteAjax(request, pk):
     if request.method == "POST":

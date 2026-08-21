@@ -263,7 +263,17 @@
     if (guardando) return;
 
     if (tipoActual === 'ABONO') {
-      // ... igual que antes, sin cambios
+      const monto = parseFloat(document.getElementById('inputMontoAbono').value);
+      const concepto = document.getElementById('inputConceptoAbono').value;
+
+      if (!monto || monto <= 0) {
+        Swal.fire('Monto inválido', 'Ingresa un monto mayor a cero.', 'warning');
+        return;
+      }
+
+      guardando = true;
+      enviarMovimiento({ tipo: 'ABONO', monto: monto, concepto: concepto });
+
     } else {
       const items = recolectarItems();
 
@@ -299,7 +309,7 @@
             Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
           });
       } else {
-        // Modo CREAR (como ya lo tenías)
+        // Modo CREAR
         enviarMovimiento({ tipo: 'CARGO', monto: total, concepto: conceptoResumen, productos: items });
       }
     }
