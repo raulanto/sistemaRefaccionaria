@@ -2,7 +2,14 @@ import json
 from django.views import View
 from django.shortcuts import render
 from django.http import JsonResponse
-
+from datetime import timedelta
+from django.views import View
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.utils import timezone
+from xhtml2pdf import pisa
+from inventario.models import MovimientoInventario
 from inventario.models import MovimientoInventario
 from inventario.services.inventario_service import InventarioService
 
@@ -47,23 +54,6 @@ class SalidaInventarioView(View):
             return JsonResponse({'estado': 'ok', 'cantidad': len(items)})
         except Exception as e:
             return JsonResponse({'estado': 'error', 'mensaje': str(e)})
-
-
-class MovimientosListView(View):
-    def get(self, request):
-        movimientos = MovimientoInventario.objects.select_related('producto', 'usuario')[:100]
-        return render(request, 'inventarioMovimientos/historial.html',
-                      {'movimientos': movimientos, 'titulo': 'Historial de movimientos'})
-
-from datetime import timedelta
-from django.views import View
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from django.utils import timezone
-from xhtml2pdf import pisa
-
-from inventario.models import MovimientoInventario
 
 
 def _filtrar_movimientos(request):

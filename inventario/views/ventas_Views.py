@@ -158,35 +158,5 @@ def cancelar_venta(request, id):
         return JsonResponse({"estado": "ok"})
 
 
-from django.http import JsonResponse
-from django.db.models import Q
-
-
-def buscar_productos_ajax(request):
-    """ ""
-    Busca productos por código o nombre para el modal de búsqueda del punto de venta.
-    GET /productos/buscar_ajax/?q=balata
-    """
-    q = request.GET.get("q", "").strip()
-
-    productos = Producto.objects.all()
-
-    if q:
-        productos = productos.filter(Q(codigo__icontains=q) | Q(nombre__icontains=q))
-
-    productos = productos.order_by("nombre")[:20]
-
-    data = [
-        {
-            "id": p.id,
-            "codigo": p.codigo,
-            "nombre": p.nombre,
-            "precio": float(p.precio_venta),
-            "stock": p.stock,
-            'marca': p.marca.nombre,
-        }
-        for p in productos
-    ]
-    return JsonResponse({"productos": data})
 
 

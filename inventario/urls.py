@@ -1,7 +1,6 @@
 from django.urls import path
 from inventario.views import cierreCaja_Views, inventarioMovimientos_Views
-from .views import ProveedorListaView, CategoriaListaView, ProveedorDetalleView, producto_Views
-from .views import ProveedorListaView, CategoriaListaView, ProveedorDetalleView, DashboardView
+from .views import ProveedorListaView, CategoriaListaView, ProveedorDetalleView, producto_Views, DashboardView
 from . import views
 from .views.proveedor_Views import ProveedorCrearView, ProveedorEditarView
 from .views import kardex_Views
@@ -22,7 +21,7 @@ urlpatterns = [
     path('producto/producto_editar/<int:pk>/', producto_Views.ProductoEditarView.as_view(), name='editarProducto'),
     path('eliminarProducto/<int:pk>/',producto_Views.EliminarProductoAjax,name='eliminarProductoAjax'),
     path('productos/exportar/', producto_Views.ExportarProdutosExcel, name='exportarProductosExcel'),
-    path('productos/buscar_ajax/', views.buscar_productos_ajax, name='buscar_productos_ajax'),
+    path('productos/buscar_ajax/', producto_Views.buscar_productos_ajax, name='buscar_productos_ajax'),
     path('producto/alertas_stock/', producto_Views.AlertasStockView.as_view(), name='alertasStock'),
 
     
@@ -63,7 +62,7 @@ urlpatterns = [
     path('venta/<int:id>/', views.detalle_venta_nota, name='detalle_venta_nota'),
     path("venta/<int:id>/ticket/",views.imprimir_ticket,name="imprimir_ticket",),
     path("cancelar_venta/<int:id>/", views.cancelar_venta, name="cancelar_venta"),
-    path('ventas_views/', views.buscar_productos_ajax, name='buscar_productos_ajax'),
+    path('ventas_views/', producto_Views.buscar_productos_ajax, name='buscar_productos_ajax'),
 
     
     #CONFIGURACION TICKET
